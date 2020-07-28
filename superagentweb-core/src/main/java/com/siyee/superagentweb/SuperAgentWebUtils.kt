@@ -39,7 +39,7 @@ fun getSuperAgentWebFilePath(context: Context): String {
 
 fun getDiskExternalCacheDir(context: Context): String? {
     val file = context.externalCacheDir
-    if (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(file))) {
+    if (Environment.MEDIA_MOUNTED == Environment.getStorageState(file)) {
         return file?.absolutePath
     }
     return null
