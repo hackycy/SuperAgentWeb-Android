@@ -52,7 +52,8 @@ fun getMIMEType(file: File): String {
     /* 取得扩展名 */
     val end = fName.substring(fName.lastIndexOf(".") + 1, fName.length).toLowerCase()
     /* 依扩展名的类型决定MimeType */
-    /* 依扩展名的类型决定MimeType */type = if (end == "pdf") {
+    /* 依扩展名的类型决定MimeType */
+    type = if (end == "pdf") {
         "application/pdf" //
     } else if (end == "m4a" || end == "mp3" || end == "mid" || end == "xmf" || end == "ogg" || end == "wav") {
         "audio/*"
