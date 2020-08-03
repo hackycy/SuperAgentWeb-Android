@@ -1,6 +1,8 @@
-package com.siyee.superagentweb;
+package com.siyee.superagentweb.utils;
 
 import android.util.Log;
+
+import com.siyee.superagentweb.AgentWebConfig;
 
 public class LogUtils {
 

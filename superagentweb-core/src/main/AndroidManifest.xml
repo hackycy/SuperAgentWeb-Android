@@ -1,5 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.siyee.superagentweb">
 
-    /
+    <application>
+        <!--   FIleProvider    -->
+        <provider
+            android:name="com.siyee.superagentweb.AgentWebFileProvider"
+            android:authorities="${applicationId}.AgentWebFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/web_files_public"/>
+        </provider>
+
+    </application>
 </manifest>
