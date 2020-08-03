@@ -6,7 +6,7 @@ public interface IndicatorController {
 
     void progress(WebView v, int newProgress);
 
-//    BaseIndicatorSpec offerIndicator();
+    BaseIndicatorSpec offerIndicator();
 
     void showIndicator();
 
