@@ -30,14 +30,19 @@ import java.util.List;
  * @author hackycy
  * @date 2020/8/3
  */
-public class SuperAgentWebUtils {
+public class AgentWebUtils {
 
     private static Toast mToast = null;
 
     private static Handler mHandler = null;
 
-    private SuperAgentWebUtils() {
+    private AgentWebUtils() {
         throw new UnsupportedOperationException("SuperAgentWebUtils can' t init");
+    }
+
+    public static int dp2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dipValue * scale + 0.5f);
     }
 
     public static void clearWebView(WebView m) {
@@ -137,7 +142,7 @@ public class SuperAgentWebUtils {
         return Looper.myLooper() == Looper.getMainLooper();
     }
 
-    public static void runInUiThread(Runnable runnable) {
+    public static void runOnUIThread(Runnable runnable) {
         if (mHandler == null) {
             mHandler = new Handler(Looper.getMainLooper());
         }
