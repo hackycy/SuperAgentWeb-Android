@@ -3,6 +3,7 @@ package com.siyee.superagentweb.utils;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -200,6 +201,20 @@ public class AgentWebUtils {
         }
         @SuppressLint("MissingPermission") NetworkInfo info = connectivity.getActiveNetworkInfo();
         return info != null && info.isConnected();
+    }
+
+    /**
+     * Copy from com.blankj.utilcode.util.ActivityUtils#getActivityByView
+     */
+    public Activity getActivityByContext(Context context) {
+        if (context instanceof Activity) return (Activity) context;
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        return null;
     }
 
 }
