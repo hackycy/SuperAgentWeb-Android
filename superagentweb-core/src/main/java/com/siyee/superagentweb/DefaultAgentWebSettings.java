@@ -17,20 +17,14 @@ import com.siyee.superagentweb.utils.ProcessUtils;
 /**
  * @author hackycy
  */
-public class AgentWebSettingsImpl implements IAgentWebSettings, WebListenerManager {
+public class DefaultAgentWebSettings implements IAgentWebSettings, WebListenerManager {
 
     private WebSettings mWebSettings;
 
-    protected SuperAgentWeb mAgentWeb;
-
-    private static final String TAG = AgentWebSettingsImpl.class.getSimpleName();
+    private static final String TAG = DefaultAgentWebSettings.class.getSimpleName();
     public static final String USERAGENT_UC = " UCBrowser/11.6.4.950 ";
     public static final String USERAGENT_QQ_BROWSER = " MQQBrowser/8.0 ";
     public static final String USERAGENT_AGENTWEB = " " + AgentWebConfig.AGENTWEB_VERSION + " ";
-
-    public final void bindSuperAgentWeb(SuperAgentWeb superAgentWeb) {
-        this.mAgentWeb = superAgentWeb;
-    }
 
     @Override
     public IAgentWebSettings toSetting(WebView webView) {
