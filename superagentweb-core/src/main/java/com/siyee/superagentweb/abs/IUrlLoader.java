@@ -1,4 +1,4 @@
-package com.siyee.superagentweb;
+package com.siyee.superagentweb.abs;
 
 import java.util.Map;
 

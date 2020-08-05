@@ -1,4 +1,4 @@
-package com.siyee.superagentweb;
+package com.siyee.superagentweb.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -16,6 +16,7 @@ import android.view.animation.LinearInterpolator;
 
 import androidx.annotation.Nullable;
 
+import com.siyee.superagentweb.abs.BaseIndicatorSpec;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.AgentWebUtils;
 

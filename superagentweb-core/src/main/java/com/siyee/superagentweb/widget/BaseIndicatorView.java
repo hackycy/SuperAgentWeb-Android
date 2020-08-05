@@ -1,4 +1,4 @@
-package com.siyee.superagentweb;
+package com.siyee.superagentweb.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,10 +6,13 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 
+import com.siyee.superagentweb.abs.BaseIndicatorSpec;
+import com.siyee.superagentweb.abs.LayoutParamsOffer;
+
 /**
  * @author hackycy
  */
-public abstract class BaseIndicatorView extends FrameLayout implements BaseIndicatorSpec, LayoutParamsOffer{
+public abstract class BaseIndicatorView extends FrameLayout implements BaseIndicatorSpec, LayoutParamsOffer {
     public BaseIndicatorView(Context context) {
         super(context);
     }

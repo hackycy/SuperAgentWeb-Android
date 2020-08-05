@@ -1,4 +1,4 @@
-package com.siyee.superagentweb;
+package com.siyee.superagentweb.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;

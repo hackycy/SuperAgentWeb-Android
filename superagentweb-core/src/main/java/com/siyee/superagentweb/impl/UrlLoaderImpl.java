@@ -1,9 +1,10 @@
-package com.siyee.superagentweb;
+package com.siyee.superagentweb.impl;
 
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 
+import com.siyee.superagentweb.abs.IUrlLoader;
 import com.siyee.superagentweb.utils.AgentWebUtils;
 
 import java.util.Map;
