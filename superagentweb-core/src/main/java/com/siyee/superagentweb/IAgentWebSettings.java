@@ -7,6 +7,6 @@ public interface IAgentWebSettings<WS extends WebSettings> {
 
     IAgentWebSettings toSetting(WebView webView);
 
-    WS getSetting();
+    WS getWebSettings();
 
 }

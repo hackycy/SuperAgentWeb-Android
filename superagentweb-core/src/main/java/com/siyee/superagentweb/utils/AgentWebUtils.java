@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.siyee.superagentweb.AgentWebConfig.AGENTWEB_CACHE_PATCH;
+
 /**
  * @author hackycy
  * @date 2020/8/3
@@ -215,6 +217,18 @@ public class AgentWebUtils {
             context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
+    }
+
+    public static String getDatabasesCachePath(Context context) {
+        return context.getApplicationContext().getDir("database", Context.MODE_PRIVATE).getPath();
+    }
+
+    /**
+     * @param context
+     * @return WebView 的缓存路径
+     */
+    public static String getCachePath(Context context) {
+        return context.getCacheDir().getAbsolutePath() + AGENTWEB_CACHE_PATCH;
     }
 
 }

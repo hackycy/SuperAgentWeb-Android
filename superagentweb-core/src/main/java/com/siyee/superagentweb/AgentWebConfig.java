@@ -8,8 +8,8 @@ import java.io.File;
 
 public class AgentWebConfig {
 
-    static final String FILE_CACHE_PATH = "superagentweb-cache";
-    static final String AGENTWEB_CACHE_PATCH = File.separator + "superagentweb-cache";
+    public static final String FILE_CACHE_PATH = "superagentweb-cache";
+    public static final String AGENTWEB_CACHE_PATCH = File.separator + FILE_CACHE_PATH;
 
     /**
      * Log Debug switch
@@ -56,18 +56,5 @@ public class AgentWebConfig {
      * 通过JS获取的文件大小， 这里限制最大为5MB ，太大会抛出 OutOfMemoryError
      */
     public static int MAX_FILE_LENGTH = 1024 * 1024 * 5;
-
-    /**
-     * 获取Cookie
-     * @param url domain
-     * @return cookie value
-     */
-    public static String getCookiesByUrl(String url) {
-        return CookieManager.getInstance() == null ? null : CookieManager.getInstance().getCookie(url);
-    }
-
-    static String getDatabasesCachePath(Context context) {
-        return context.getApplicationContext().getDir("database", Context.MODE_PRIVATE).getPath();
-    }
 
 }

@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * Adapted from com.blankj.utilcode.util.ProcessUtils#getCurrentProcessName
  */
-class ProcessUtils {
+public class ProcessUtils {
 
-    static String getCurrentProcessName(Context context) {
+    public static String getCurrentProcessName(Context context) {
         String name = getCurrentProcessNameByFile();
         if (!TextUtils.isEmpty(name)) return name;
         name = getCurrentProcessNameByAms(context);
