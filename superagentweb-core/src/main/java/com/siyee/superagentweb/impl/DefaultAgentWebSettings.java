@@ -104,7 +104,7 @@ public class DefaultAgentWebSettings implements IAgentWebSettings, WebListenerMa
         mWebSettings.setUserAgentString(getWebSettings()
                 .getUserAgentString()
                 .concat(USERAGENT_AGENTWEB)
-                .concat(USERAGENT_UC)
+//                .concat(USERAGENT_UC)
         );
         LogUtils.i(TAG, "UserAgentString : " + mWebSettings.getUserAgentString());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
