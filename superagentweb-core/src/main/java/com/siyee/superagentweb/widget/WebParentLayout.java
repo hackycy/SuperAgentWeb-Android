@@ -43,14 +43,21 @@ import com.siyee.superagentweb.utils.LogUtils;
  * @since 3.0.0
  */
 public class WebParentLayout extends FrameLayout implements Provider<AbsAgentWebUIController> {
+
 	private AbsAgentWebUIController mAgentWebUIController = null;
+
 	private static final String TAG = WebParentLayout.class.getSimpleName();
+
 	@LayoutRes
 	private int mErrorLayoutRes;
+
 	@IdRes
 	private int mClickId = -1;
+
 	private View mErrorView;
+
 	private WebView mWebView;
+
 	private FrameLayout mErrorLayout = null;
 
 	public WebParentLayout(@NonNull Context context) {
@@ -149,11 +156,11 @@ public class WebParentLayout extends FrameLayout implements Provider<AbsAgentWeb
 		}
 	}
 
-	void setErrorView(@NonNull View errorView) {
+	public void setErrorView(@NonNull View errorView) {
 		this.mErrorView = errorView;
 	}
 
-	void setErrorLayoutRes(@LayoutRes int resLayout, @IdRes int id) {
+	public void setErrorLayoutRes(@LayoutRes int resLayout, @IdRes int id) {
 		this.mClickId = id;
 		if (this.mClickId <= 0) {
 			this.mClickId = -1;
@@ -170,13 +177,13 @@ public class WebParentLayout extends FrameLayout implements Provider<AbsAgentWeb
 	}
 
 
-	void bindWebView(WebView view) {
+	public void bindWebView(WebView view) {
 		if (this.mWebView == null) {
 			this.mWebView = view;
 		}
 	}
 
-	WebView getWebView() {
+	public WebView getWebView() {
 		return this.mWebView;
 	}
 
