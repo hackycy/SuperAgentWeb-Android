@@ -18,4 +18,5 @@
     <string name="agentweb_leave">Go away</string>
     <string name="agentweb_max_file_length_limit">The selected file can not be larger than %s MB</string>
     <string name="agentweb_default_page_error">Error! Click the blank space to refresh ~</string>
+    <string name="agentweb_permission_deny_tips">Permission denied</string>
 </resources>
