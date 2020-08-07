@@ -86,11 +86,6 @@ public class SuperAgentWeb {
     private WebListenerManager mWebListenerManager;
 
     /**
-     * flag security 's mode
-     */
-    private SecurityType mSecurityType = SecurityType.DEFAULT_CHECK;
-
-    /**
      * Activity
      */
     private static final int ACTIVITY_TAG = 0;

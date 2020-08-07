@@ -24,21 +24,6 @@ public class AgentWebConfig {
      */
     static final boolean IS_KITKAT_OR_BELOW_KITKAT = Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT;
 
-    /**
-     * 默认 WebView  类型 。
-     */
-    public static final int WEBVIEW_DEFAULT_TYPE = 1;
-
-    /**
-     * 使用 AgentWebView
-     */
-    public static final int WEBVIEW_AGENTWEB_SAFE_TYPE = 2;
-
-    /**
-     * 自定义 WebView
-     */
-    public static final int WEBVIEW_CUSTOM_TYPE = 3;
-
     private static volatile boolean IS_INITIALIZED = false;
 
     private static final String TAG = AgentWebConfig.class.getSimpleName();
