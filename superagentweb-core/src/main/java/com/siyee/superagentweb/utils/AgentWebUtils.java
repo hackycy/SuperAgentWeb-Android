@@ -153,7 +153,7 @@ public class AgentWebUtils {
     }
 
     @SuppressLint("ShowToast")
-    static void toastShowShort(Context context, String msg) {
+    public static void toastShowShort(Context context, String msg) {
         if (mToast == null) {
             mToast = Toast.makeText(context.getApplicationContext(), msg, Toast.LENGTH_SHORT);
         } else {
