@@ -1,8 +1,6 @@
 package com.siyee.superagentweb;
 
-import android.content.Context;
 import android.os.Build;
-import android.webkit.CookieManager;
 
 import java.io.File;
 
