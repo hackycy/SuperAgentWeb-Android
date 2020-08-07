@@ -119,7 +119,7 @@ public class WebIndicator extends BaseIndicatorView implements BaseIndicatorSpec
         int h = MeasureSpec.getSize(heightMeasureSpec);
 
         if (wMode == MeasureSpec.AT_MOST) {
-            w = w <= getContext().getResources().getDisplayMetrics().widthPixels ? w : getContext().getResources().getDisplayMetrics().widthPixels;
+            w = Math.min(w, getContext().getResources().getDisplayMetrics().widthPixels);
         }
         if (hMode == MeasureSpec.AT_MOST) {
             h = mWebIndicatorDefaultHeight;
@@ -134,7 +134,7 @@ public class WebIndicator extends BaseIndicatorView implements BaseIndicatorSpec
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
-        canvas.drawRect(0, 0, mCurrentProgress / 100 * Float.valueOf(this.getWidth()), this.getHeight(), mPaint);
+        canvas.drawRect(0, 0, mCurrentProgress / 100 * (float) this.getWidth(), this.getHeight(), mPaint);
     }
 
     @Override

@@ -3,5 +3,6 @@
 
     <item name="mainframe_error_container_id" type="id" />
     <item name="mainframe_error_viewsub_id" type="id" />
+    <item name="web_parent_layout_id" type="id" />
 
 </resources>
