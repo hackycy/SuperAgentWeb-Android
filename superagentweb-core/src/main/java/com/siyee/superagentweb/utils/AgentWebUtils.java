@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -25,6 +26,9 @@ import androidx.core.content.ContextCompat;
 import androidx.core.os.EnvironmentCompat;
 
 import com.siyee.superagentweb.AgentWebConfig;
+import com.siyee.superagentweb.R;
+import com.siyee.superagentweb.abs.AbsAgentWebUIController;
+import com.siyee.superagentweb.widget.WebParentLayout;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -148,6 +152,37 @@ public class AgentWebUtils {
             }
         }
         return deniedPermissions;
+    }
+
+    public static AbsAgentWebUIController getAgentWebUIControllerByWebView(WebView webView) {
+        WebParentLayout mWebParentLayout = getWebParentLayoutByWebView(webView);
+        return mWebParentLayout.provide();
+    }
+
+    public static WebParentLayout getWebParentLayoutByWebView(WebView webView) {
+        ViewGroup mViewGroup = null;
+        if (!(webView.getParent() instanceof ViewGroup)) {
+            throw new IllegalStateException("please check webcreator's create method was be called ?");
+        }
+        mViewGroup = (ViewGroup) webView.getParent();
+        AbsAgentWebUIController mAgentWebUIController;
+        while (mViewGroup != null) {
+
+            LogUtils.i(TAG, "ViewGroup:" + mViewGroup);
+            if (mViewGroup.getId() == R.id.web_parent_layout_id) {
+                WebParentLayout mWebParentLayout = (WebParentLayout) mViewGroup;
+                LogUtils.i(TAG, "found WebParentLayout");
+                return mWebParentLayout;
+            } else {
+                ViewParent mViewParent = mViewGroup.getParent();
+                if (mViewParent instanceof ViewGroup) {
+                    mViewGroup = (ViewGroup) mViewParent;
+                } else {
+                    mViewGroup = null;
+                }
+            }
+        }
+        throw new IllegalStateException("please check webcreator's create method was be called ?");
     }
 
     public static boolean isUIThread() {
