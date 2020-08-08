@@ -11,6 +11,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.EventInterceptor;
 import com.siyee.superagentweb.abs.IAgentWebSettings;
 import com.siyee.superagentweb.abs.IEventHandler;
@@ -22,10 +23,19 @@ import com.siyee.superagentweb.abs.IndicatorController;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.abs.WebCreator;
 import com.siyee.superagentweb.abs.WebListenerManager;
+import com.siyee.superagentweb.impl.AgentWebUIControllerImplBase;
+import com.siyee.superagentweb.impl.DefaultWebCreator;
+import com.siyee.superagentweb.impl.DefaultWebLifeCycleImpl;
+import com.siyee.superagentweb.impl.EventHandlerImpl;
+import com.siyee.superagentweb.impl.UrlLoaderImpl;
+import com.siyee.superagentweb.impl.VideoImpl;
 import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
 import com.siyee.superagentweb.utils.CookieUtils;
 import com.siyee.superagentweb.widget.BaseIndicatorView;
+import com.siyee.superagentweb.widget.WebParentLayout;
+
+import java.lang.ref.WeakReference;
 
 /**
  * @author hackycy
@@ -56,11 +66,6 @@ public class SuperAgentWeb {
      * 管理 WebSettings
      */
     private IAgentWebSettings mAgentWebSettings;
-
-    /**
-     * SuperAgentWeb
-     */
-    private SuperAgentWeb mSuperAgentWeb = null;
 
     /**
      * IndicatorController 控制Indicator
@@ -129,7 +134,13 @@ public class SuperAgentWeb {
      * 是否拦截未知的Url
      */
     private boolean mIsInterceptUnkownUrl = false;
-    private OpenOtherPageWays mUrlHandleWays = OpenOtherPageWays.ASK;
+
+    private OpenOtherPageWays mOpenOtherPageWays = OpenOtherPageWays.ASK;
+
+    /**
+     * WebViewClient 辅助控制开关
+     */
+    private boolean mWebClientHelper = true;
 
     /**
      * 事件拦截
@@ -146,17 +157,105 @@ public class SuperAgentWeb {
     private MiddlewareWebChromeBase mMiddlewareWebChromeBaseHeader;
 
     /**
-     * @return PermissionInterceptor 权限控制者
+     * constructor
+     * @param builder
      */
-    public PermissionInterceptor getPermissionInterceptor() {
-        return this.mPermissionInterceptor;
+    private SuperAgentWeb(Builder builder) {
+        mTagTarget = builder.mTag;
+        this.mActivity = builder.mActivity;
+        this.mViewGroup = builder.mViewGroup;
+        this.mEventHandler = builder.mEventHandler;
+        this.mEnableIndicator = builder.mEnableIndicator;
+        this.mWebCreator = builder.mWebCreator == null ? configWebCreator(builder.mBaseIndicatorView, builder.mIndex, builder.mLayoutParams,
+                builder.mIndicatorColor, builder.mHeight, builder.mWebView, builder.mWebLayout) : builder.mWebCreator;
+        this.mIndicatorController = builder.mIndicatorController;
+        this.mWebChromeClient = builder.mWebChromeClient;
+        this.mWebViewClient = builder.mWebViewClient;
+        this.mAgentWebSettings = builder.mAgentWebSettings;
+        this.mPermissionInterceptor = builder.mPermissionInterceptor == null ? null : new PermissionInterceptorWrapper(builder.mPermissionInterceptor);
+        this.mIUrlLoader = new UrlLoaderImpl(mWebCreator.create().getWebView());
+        if (this.mWebCreator.getWebParentLayout() instanceof WebParentLayout) {
+            WebParentLayout mWebParentLayout = (WebParentLayout) this.mWebCreator.getWebParentLayout();
+            mWebParentLayout.bindController(builder.mAgentWebUIController == null ? AgentWebUIControllerImplBase.build() : builder.mAgentWebUIController);
+            mWebParentLayout.setErrorLayoutRes(builder.mErrorLayout, builder.mReloadId);
+            mWebParentLayout.setErrorView(builder.mErrorView);
+        }
+        this.mWebLifeCycle = new DefaultWebLifeCycleImpl(this.mWebCreator.getWebView());
+        this.mWebClientHelper = builder.mWebClientHelper;
+        this.mIsInterceptUnkownUrl = builder.mIsInterceptUnkownUrl;
+        if (builder.mOpenOtherPageWays != null) {
+            this.mOpenOtherPageWays = builder.mOpenOtherPageWays;
+        }
+        this.mMiddlewareWebChromeBaseHeader = builder.mMiddlewareWebChromeBaseHeader;
+        this.mMiddleWrareWebClientBaseHeader = builder.mMiddlewareWebClientBaseHeader;
+        init();
     }
 
-    public IWebLifeCycle getWebLifeCycle() {
-        return this.mWebLifeCycle;
+    private void init() {
+
     }
+
+    /**
+     * prepare webview
+     * @return
+     */
+    private SuperAgentWeb ready() {
+        CookieUtils.initCookiesManager(mActivity.getApplicationContext());
+        return this;
+    }
+
+    /**
+     * create WebCreator
+     * @param progressView
+     * @param index
+     * @param lp
+     * @param indicatorColor
+     * @param height_dp
+     * @param webView
+     * @param webLayout
+     * @return
+     */
+    private WebCreator configWebCreator(BaseIndicatorView progressView,
+                                        int index,
+                                        ViewGroup.LayoutParams lp,
+                                        int indicatorColor,
+                                        int height_dp,
+                                        WebView webView,
+                                        IWebLayout webLayout) {
+        if (progressView != null && mEnableIndicator) {
+            return new DefaultWebCreator(mActivity, mViewGroup, lp, index, progressView, webView, webLayout);
+        }
+        return mEnableIndicator ?
+                new DefaultWebCreator(mActivity, mViewGroup, lp, index, indicatorColor, height_dp, webView, webLayout)
+                : new DefaultWebCreator(mActivity, mViewGroup, lp, index, webView, webLayout);
+    }
+
+    /**
+     * get real WebViewClient
+     * @return
+     */
+    private android.webkit.WebViewClient getWebViewClient() {
+        return null;
+    }
+
+    /**
+     * EventInterceptor
+     * @return
+     */
+    private EventInterceptor getInterceptor() {
+        if (this.mEventInterceptor != null) {
+            return this.mEventInterceptor;
+        }
+        if (mIVideo instanceof VideoImpl) {
+            return this.mEventInterceptor = (EventInterceptor) this.mIVideo;
+        }
+        return null;
+    }
+
+    //----------------------- Expose -------------------------------
 
     public static Builder with(@NonNull Activity activity) {
+        //noinspection ConstantConditions
         if (activity == null) {
             throw new NullPointerException("activity can not be null .");
         }
@@ -171,17 +270,31 @@ public class SuperAgentWeb {
         return new Builder(mActivity, fragment);
     }
 
-    /**
-     * constructor
-     * @param builder
-     */
-    private SuperAgentWeb(Builder builder) {
-        mTagTarget = builder.mTag;
+    public PermissionInterceptor getPermissionInterceptor() {
+        return this.mPermissionInterceptor;
     }
 
-    public SuperAgentWeb ready() {
-        CookieUtils.initCookiesManager(mActivity.getApplicationContext());
-        return this;
+    public IWebLifeCycle getWebLifeCycle() {
+        return this.mWebLifeCycle;
+    }
+
+    public boolean back() {
+        if (this.mEventHandler == null) {
+            mEventHandler = EventHandlerImpl.getInstantce(mWebCreator.getWebView(), getInterceptor());
+        }
+        return mEventHandler.back();
+    }
+
+    public WebCreator getWebCreator() {
+        return this.mWebCreator;
+    }
+
+    public IEventHandler getIEventHandler() {
+        return this.mEventHandler == null ? (this.mEventHandler = EventHandlerImpl.getInstantce(mWebCreator.getWebView(), getInterceptor())) : this.mEventHandler;
+    }
+
+    public Activity getActivity() {
+        return this.mActivity;
     }
 
     /**
@@ -192,12 +305,14 @@ public class SuperAgentWeb {
         /** Context **/
         private Activity mActivity;
         private Fragment mFragment;
-        private int mTag;
+        private int mTag = -1;
 
         /** UI **/
         private ViewGroup mViewGroup;
         private ViewGroup.LayoutParams mLayoutParams;
         private int mIndex;
+        private WebCreator mWebCreator;
+        private IndicatorController mIndicatorController;
         /** 进度条默认显示 **/
         private boolean mEnableIndicator = true;
         private int mIndicatorColor = -1;
@@ -214,10 +329,13 @@ public class SuperAgentWeb {
 
         /** 功能相关 **/
         private boolean mIsInterceptUnkownUrl = false;
-        private OpenOtherPageWays mOpenOtherPageWays = OpenOtherPageWays.ASK;
-
+        private OpenOtherPageWays mOpenOtherPageWays;
+        private boolean mWebClientHelper = true;
         private WebView mWebView;
         private IAgentWebSettings mAgentWebSettings;
+        private PermissionInterceptor mPermissionInterceptor;
+        private AbsAgentWebUIController mAgentWebUIController;
+        private IEventHandler mEventHandler;
 
         /** Client And Middleware **/
         private com.siyee.superagentweb.WebChromeClient mWebChromeClient;
@@ -312,6 +430,11 @@ public class SuperAgentWeb {
             return this;
         }
 
+        public Builder closeWebViewClientHelper() {
+            this.mWebClientHelper = false;
+            return this;
+        }
+
         public Builder setWebView(@Nullable WebView webView) {
             this.mWebView = webView;
             return this;
@@ -319,6 +442,21 @@ public class SuperAgentWeb {
 
         public Builder setAgentWebSettings(@Nullable IAgentWebSettings webSettings) {
             this.mAgentWebSettings = webSettings;
+            return this;
+        }
+
+        public Builder setPermissionInterceptor(@Nullable PermissionInterceptor permissionInterceptor) {
+            this.mPermissionInterceptor = permissionInterceptor;
+            return this;
+        }
+
+        public Builder setAgentWebUIController(@Nullable AgentWebUIControllerImplBase agentWebUIController) {
+            this.mAgentWebUIController = agentWebUIController;
+            return this;
+        }
+
+        public Builder setEventHanadler(@Nullable IEventHandler iEventHandler) {
+            this.mEventHandler = iEventHandler;
             return this;
         }
 
@@ -369,6 +507,26 @@ public class SuperAgentWeb {
             return new SuperAgentWeb(this).ready();
         }
 
+    }
+
+    /**
+     * PermissionInterceptorWrapper
+     */
+    private static final class PermissionInterceptorWrapper implements PermissionInterceptor {
+
+        private WeakReference<PermissionInterceptor> mWeakReference;
+
+        private PermissionInterceptorWrapper(PermissionInterceptor permissionInterceptor) {
+            this.mWeakReference = new WeakReference<PermissionInterceptor>(permissionInterceptor);
+        }
+
+        @Override
+        public boolean intercept(String url, String[] permissions, String a) {
+            if (this.mWeakReference.get() == null) {
+                return false;
+            }
+            return mWeakReference.get().intercept(url, permissions, a);
+        }
     }
 
 }

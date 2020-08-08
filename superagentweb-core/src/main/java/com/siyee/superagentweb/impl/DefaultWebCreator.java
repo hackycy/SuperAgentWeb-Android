@@ -60,7 +60,7 @@ public class DefaultWebCreator implements WebCreator {
      * @param webView
      * @param webLayout
      */
-    protected DefaultWebCreator(@NonNull Activity activity,
+    public DefaultWebCreator(@NonNull Activity activity,
                                 @Nullable ViewGroup viewGroup,
                                 ViewGroup.LayoutParams lp,
                                 int index,
@@ -89,7 +89,7 @@ public class DefaultWebCreator implements WebCreator {
      * @param webView
      * @param webLayout
      */
-    protected DefaultWebCreator(@NonNull Activity activity,
+    public DefaultWebCreator(@NonNull Activity activity,
                                 @Nullable ViewGroup viewGroup,
                                 ViewGroup.LayoutParams lp,
                                 int index,
@@ -115,7 +115,7 @@ public class DefaultWebCreator implements WebCreator {
      * @param webView
      * @param webLayout
      */
-    protected DefaultWebCreator(@NonNull Activity activity,
+    public DefaultWebCreator(@NonNull Activity activity,
                                 @Nullable ViewGroup viewGroup,
                                 ViewGroup.LayoutParams lp,
                                 int index,
