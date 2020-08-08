@@ -24,6 +24,7 @@ import com.siyee.superagentweb.abs.WebCreator;
 import com.siyee.superagentweb.abs.WebListenerManager;
 import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
+import com.siyee.superagentweb.utils.CookieUtils;
 import com.siyee.superagentweb.widget.BaseIndicatorView;
 
 /**
@@ -179,6 +180,7 @@ public class SuperAgentWeb {
     }
 
     public SuperAgentWeb ready() {
+        CookieUtils.initCookiesManager(mActivity.getApplicationContext());
         return this;
     }
 

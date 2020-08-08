@@ -9,9 +9,12 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -19,12 +22,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.AppOpsManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.os.EnvironmentCompat;
+
+import com.siyee.superagentweb.AgentWebConfig;
 
 import java.io.File;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static com.siyee.superagentweb.AgentWebConfig.AGENTWEB_CACHE_PATCH;
@@ -34,6 +41,8 @@ import static com.siyee.superagentweb.AgentWebConfig.AGENTWEB_CACHE_PATCH;
  * @date 2020/8/3
  */
 public class AgentWebUtils {
+
+    private static final String TAG = AgentWebUtils.class.getSimpleName();
 
     private static Toast mToast = null;
 
@@ -175,6 +184,36 @@ public class AgentWebUtils {
         return "";
     }
 
+    public static int clearCacheFolder(final File dir, final int numDays) {
+        int deletedFiles = 0;
+        if (dir != null) {
+            Log.i("Info", "dir:" + dir.getAbsolutePath());
+        }
+        if (dir != null && dir.isDirectory()) {
+            try {
+                for (File child : dir.listFiles()) {
+
+                    //first delete subdirectories recursively
+                    if (child.isDirectory()) {
+                        deletedFiles += clearCacheFolder(child, numDays);
+                    }
+
+                    //then delete the files and subdirectories in this dir
+                    //only empty directories can be deleted, so subdirs have been done first
+                    if (child.lastModified() < new Date().getTime() - numDays * DateUtils.DAY_IN_MILLIS) {
+                        Log.i(TAG, "file name:" + child.getName());
+                        if (child.delete()) {
+                            deletedFiles++;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e("Info", String.format("Failed to clean the cache, result %s", e.getMessage()));
+            }
+        }
+        return deletedFiles;
+    }
+
     public static String getApplicationName(Context context) {
         PackageManager packageManager = null;
         ApplicationInfo applicationInfo = null;
@@ -229,6 +268,39 @@ public class AgentWebUtils {
      */
     public static String getCachePath(Context context) {
         return context.getCacheDir().getAbsolutePath() + AGENTWEB_CACHE_PATCH;
+    }
+
+    /**
+     * @param context
+     * @return AgentWeb 缓存路径
+     */
+    public static String getExternalCachePath(Context context) {
+        return getAgentWebFilePath(context);
+    }
+
+    public static String getAgentWebFilePath(Context context) {
+        if (!TextUtils.isEmpty(AgentWebConfig.AGENTWEB_FILE_PATH)) {
+            return AgentWebConfig.AGENTWEB_FILE_PATH;
+        }
+        String dir = getDiskExternalCacheDir(context);
+        File mFile = new File(dir, AgentWebConfig.FILE_CACHE_PATH);
+        try {
+            if (!mFile.exists()) {
+                mFile.mkdirs();
+            }
+        } catch (Throwable throwable) {
+            LogUtils.i(TAG, "create dir exception");
+        }
+        LogUtils.i(TAG, "path:" + mFile.getAbsolutePath() + "  path:" + mFile.getPath());
+        return AgentWebConfig.AGENTWEB_FILE_PATH = mFile.getAbsolutePath();
+    }
+
+    public static String getDiskExternalCacheDir(Context context) {
+        File mFile = context.getExternalCacheDir();
+        if (Environment.MEDIA_MOUNTED.equals(EnvironmentCompat.getStorageState(mFile))) {
+            return mFile.getAbsolutePath();
+        }
+        return null;
     }
 
 }
