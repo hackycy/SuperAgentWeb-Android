@@ -74,7 +74,7 @@ public abstract class AbsAgentWebUIController {
      * @param url
      * @param callback
      */
-    public abstract void onOpenPagePrompt(WebView view, String url, Handler.Callback callback);
+    public abstract void onOpenPagePrompt(WebView view, String url, Callback<Integer> callback);
 
     /**
      * WebChromeClient#onJsConfirm

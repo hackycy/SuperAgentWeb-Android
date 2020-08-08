@@ -6,11 +6,12 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -23,14 +24,18 @@ import com.alipay.sdk.util.H5PayResultModel;
 import com.siyee.superagentweb.AgentWebConfig;
 import com.siyee.superagentweb.OpenOtherPageWays;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
+import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
 import com.siyee.superagentweb.utils.AgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author hackycy
@@ -103,6 +108,11 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
     private boolean mIsInterceptUnkownUrl;
 
     /**
+     * MainFrameErrorMethod
+     */
+    private Method onMainFrameErrorMethod = null;
+
+    /**
      * AbsAgentWebUIController
      */
     private WeakReference<AbsAgentWebUIController> mAgentWebUIController = null;
@@ -116,6 +126,15 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
      * Alipay PayTask 对象
      */
     private Object mPayTask;
+
+    /**
+     * 缓存当前出现错误的页面
+     */
+    private Set<String> mErrorUrlsSet = new HashSet<>();
+    /**
+     * 缓存等待加载完成的页面 onPageStart()执行之后 ，onPageFinished()执行之前
+     */
+    private Set<String> mWaittingFinishSet = new HashSet<>();
 
     static {
         boolean tag = true;
@@ -217,184 +236,72 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
         return super.shouldOverrideUrlLoading(view, url);
     }
 
-    /**
-     *q ueryActiviesNumber
-     * @param url
-     * @return
-     */
-    private int queryActiviesNumber(String url) {
-        try {
-            if (mWeakReference.get() == null) {
-                return 0;
+    @Override
+    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+        mWaittingFinishSet.add(url);
+        super.onPageStarted(view, url, favicon);
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        if (!mErrorUrlsSet.contains(url) && mWaittingFinishSet.contains(url)) {
+            if (mAgentWebUIController.get() != null) {
+                mAgentWebUIController.get().onShowMainFrame();
             }
-            Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
-            PackageManager mPackageManager = mWeakReference.get().getPackageManager();
-            List<ResolveInfo> mResolveInfos = mPackageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            return mResolveInfos == null ? 0 : mResolveInfos.size();
-        } catch (URISyntaxException ignore) {
-            if (LogUtils.isDebug()) {
-                ignore.printStackTrace();
-            }
-            return 0;
+        }
+        mWaittingFinishSet.remove(url);
+        if (!mErrorUrlsSet.isEmpty()) {
+            mErrorUrlsSet.clear();
+        }
+        super.onPageFinished(view, url);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        // 获取当前的网络请求是否是为main frame创建的.
+        if (request.isForMainFrame()) {
+            onMainFrameError(view,
+                    error.getErrorCode(), error.getDescription().toString(),
+                    request.getUrl().toString());
         }
     }
 
+    @Override
+    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        onMainFrameError(view, errorCode, description, failingUrl);
+    }
+
     /**
-     * startActivity
-     * @param url
+     * https://blog.csdn.net/barryhappy/article/details/52733406
+     * @param view
+     * @param errorCode
+     * @param description
+     * @param failingUrl
      */
-    private void startActivity(String url) {
-        try {
-            if (mWeakReference.get() == null) {
+    private void onMainFrameError(WebView view, int errorCode, String description, String failingUrl) {
+        LogUtils.e(TAG, "onReceivedError：" + description + "  Code:" + errorCode);
+        mErrorUrlsSet.add(failingUrl);
+        // 下面逻辑判断开发者是否重写了 onMainFrameError 方法 ， 优先交给开发者处理
+        if (this.mDelegate != null && mWebClientHelper) {
+            Method mMethod = this.onMainFrameErrorMethod;
+            if (mMethod != null || (this.onMainFrameErrorMethod =
+                    mMethod = AgentWebUtils.isExistMethod(mDelegate,
+                            "onMainFrameError", AbsAgentWebUIController.class,
+                            WebView.class, int.class, String.class, String.class)) != null) {
+                try {
+                    mMethod.invoke(this.mDelegate, mAgentWebUIController.get(), view, errorCode, description, failingUrl);
+                } catch (Throwable ignore) {
+                    if (LogUtils.isDebug()) {
+                        ignore.printStackTrace();
+                    }
+                }
                 return;
             }
-            Intent intent = new Intent();
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(url));
-            mWeakReference.get().startActivity(intent);
-
-        } catch (Exception e) {
-            if (LogUtils.isDebug()) {
-                e.printStackTrace();
-            }
         }
-    }
-
-    /**
-     * lookupResolveInfo
-     * @param url
-     * @return
-     */
-    private ResolveInfo lookupResolveInfo(String url) {
-        try {
-            Intent intent;
-            Activity mActivity = null;
-            if ((mActivity = mWeakReference.get()) == null) {
-                return null;
-            }
-            PackageManager packageManager = mActivity.getPackageManager();
-            intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
-            ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            return info;
-        } catch (Throwable ignore) {
-            if (LogUtils.isDebug()) {
-                ignore.printStackTrace();
-            }
+        if (mAgentWebUIController.get() != null) {
+            mAgentWebUIController.get().onMainFrameError(view, errorCode, description, failingUrl);
         }
-        return null;
-    }
-
-    /**
-     * handleIntentUrl
-     * @param intentUrl
-     */
-    private void handleIntentUrl(String intentUrl) {
-        try {
-            Intent intent = null;
-            if (TextUtils.isEmpty(intentUrl) || !intentUrl.startsWith(INTENT_SCHEME)) {
-                return;
-            }
-            if (lookup(intentUrl)) {
-                return;
-            }
-        } catch (Throwable e) {
-            if (LogUtils.isDebug()) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * Intent lookup
-     * @param url
-     * @return
-     */
-    private boolean lookup(String url) {
-        try {
-            Intent intent;
-            Activity mActivity = null;
-            if ((mActivity = mWeakReference.get()) == null) {
-                return true;
-            }
-            PackageManager packageManager = mActivity.getPackageManager();
-            intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
-            ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            // 跳到该应用
-            if (info != null) {
-                mActivity.startActivity(intent);
-                return true;
-            }
-        } catch (Throwable ignore) {
-            if (LogUtils.isDebug()) {
-                ignore.printStackTrace();
-            }
-        }
-        return false;
-    }
-
-    /**
-     * DeepLink
-     * @param url
-     * @return
-     */
-    private boolean deepLink(String url) {
-        switch (mOpenOtherPageWays) {
-            // 直接打开其他App
-            case DERECT:
-                lookup(url);
-                return true;
-            // 咨询用户是否打开其他App
-            case ASK:
-                Activity mActivity = null;
-                if ((mActivity = mWeakReference.get()) == null) {
-                    return false;
-                }
-                ResolveInfo resolveInfo = lookupResolveInfo(url);
-                if (null == resolveInfo) {
-                    return false;
-                }
-                ActivityInfo activityInfo = resolveInfo.activityInfo;
-                LogUtils.e(TAG, "resolve package:" + resolveInfo.activityInfo.packageName + " app package:" + mActivity.getPackageName());
-                if (activityInfo != null
-                        && !TextUtils.isEmpty(activityInfo.packageName)
-                        && activityInfo.packageName.equals(mActivity.getPackageName())) {
-                    return lookup(url);
-                }
-                if (mAgentWebUIController.get() != null) {
-                    mAgentWebUIController.get()
-                            .onOpenPagePrompt(this.mWebView,
-                                    mWebView.getUrl(),
-                                    getCallback(url));
-                }
-                return true;
-            // 默认不打开
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * ASK 回调
-     * @param url
-     * @return
-     */
-    private Handler.Callback getCallback(final String url) {
-        if (this.mCallback != null) {
-            return this.mCallback;
-        }
-        return this.mCallback = new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                switch (msg.what) {
-                    case 1:
-                        lookup(url);
-                        break;
-                    default:
-                        return true;
-                }
-                return true;
-            }
-        };
     }
 
     /**
@@ -413,7 +320,7 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
              * 推荐采用的新的二合一接口(payInterceptorWithUrl),只需调用一次
              */
             if (mPayTask == null) {
-                Class clazz = Class.forName("com.alipay.sdk.app.PayTask");
+                Class<?> clazz = Class.forName("com.alipay.sdk.app.PayTask");
                 Constructor<?> mConstructor = clazz.getConstructor(Activity.class);
                 mPayTask = mConstructor.newInstance(mActivity);
             }
@@ -458,14 +365,191 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(url));
                 mActivity.startActivity(intent);
-            } catch (ActivityNotFoundException ignored) {
+            } catch (ActivityNotFoundException e) {
                 if (AgentWebConfig.DEBUG) {
-                    ignored.printStackTrace();
+                    e.printStackTrace();
                 }
             }
             return true;
         }
         return false;
+    }
+
+    /**
+     * handleIntentUrl
+     * @param intentUrl
+     */
+    private void handleIntentUrl(String intentUrl) {
+        try {
+            Intent intent = null;
+            if (TextUtils.isEmpty(intentUrl) || !intentUrl.startsWith(INTENT_SCHEME)) {
+                return;
+            }
+            if (lookup(intentUrl)) {
+                return;
+            }
+        } catch (Throwable e) {
+            if (LogUtils.isDebug()) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * DeepLink
+     * @param url
+     * @return
+     */
+    private boolean deepLink(String url) {
+        switch (mOpenOtherPageWays) {
+            // 直接打开其他App
+            case DERECT:
+                lookup(url);
+                return true;
+            // 咨询用户是否打开其他App
+            case ASK:
+                Activity mActivity = null;
+                if ((mActivity = mWeakReference.get()) == null) {
+                    return false;
+                }
+                ResolveInfo resolveInfo = lookupResolveInfo(url);
+                if (null == resolveInfo) {
+                    return false;
+                }
+                ActivityInfo activityInfo = resolveInfo.activityInfo;
+                LogUtils.e(TAG, "resolve package:" + resolveInfo.activityInfo.packageName + " app package:" + mActivity.getPackageName());
+                if (activityInfo != null
+                        && !TextUtils.isEmpty(activityInfo.packageName)
+                        && activityInfo.packageName.equals(mActivity.getPackageName())) {
+                    return lookup(url);
+                }
+                if (mAgentWebUIController.get() != null) {
+                    mAgentWebUIController.get()
+                            .onOpenPagePrompt(this.mWebView,
+                                    mWebView.getUrl(),
+                                    getCallback(url));
+                }
+                return true;
+            // 默认不打开
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Intent lookup
+     * @param url
+     * @return
+     */
+    private boolean lookup(String url) {
+        try {
+            Intent intent;
+            Activity mActivity = null;
+            if ((mActivity = mWeakReference.get()) == null) {
+                return true;
+            }
+            PackageManager packageManager = mActivity.getPackageManager();
+            intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+            ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            // 跳到该应用
+            if (info != null) {
+                mActivity.startActivity(intent);
+                return true;
+            }
+        } catch (Throwable ignore) {
+            if (LogUtils.isDebug()) {
+                ignore.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+
+
+    /**
+     * lookupResolveInfo
+     * @param url
+     * @return
+     */
+    private ResolveInfo lookupResolveInfo(String url) {
+        try {
+            Intent intent;
+            Activity mActivity = null;
+            if ((mActivity = mWeakReference.get()) == null) {
+                return null;
+            }
+            PackageManager packageManager = mActivity.getPackageManager();
+            intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+            ResolveInfo info = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            return info;
+        } catch (Throwable ignore) {
+            if (LogUtils.isDebug()) {
+                ignore.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * ASK 回调
+     * @param url
+     * @return
+     */
+    private Callback<Integer> getCallback(String url) {
+        final String copyUrl = String.copyValueOf(url.toCharArray());
+        return new Callback<Integer>() {
+
+            @Override
+            public void handleValue(Integer value) {
+                if (value == 1) {
+                    lookup(copyUrl);
+                }
+            }
+
+        };
+    }
+
+    /**
+     *q ueryActiviesNumber
+     * @param url
+     * @return
+     */
+    private int queryActiviesNumber(String url) {
+        try {
+            if (mWeakReference.get() == null) {
+                return 0;
+            }
+            Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+            PackageManager mPackageManager = mWeakReference.get().getPackageManager();
+            List<ResolveInfo> mResolveInfos = mPackageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+            return mResolveInfos == null ? 0 : mResolveInfos.size();
+        } catch (URISyntaxException ignore) {
+            if (LogUtils.isDebug()) {
+                ignore.printStackTrace();
+            }
+            return 0;
+        }
+    }
+
+    /**
+     * startActivity
+     * @param url
+     */
+    private void startActivity(String url) {
+        try {
+            if (mWeakReference.get() == null) {
+                return;
+            }
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            mWeakReference.get().startActivity(intent);
+
+        } catch (Exception e) {
+            if (LogUtils.isDebug()) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static Builder createBuilder() {

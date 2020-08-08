@@ -17,6 +17,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.siyee.superagentweb.R;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
+import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.utils.AgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.widget.WebParentLayout;
@@ -68,7 +69,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 	}
 
 	@Override
-	public void onOpenPagePrompt(WebView view, String url, final Handler.Callback callback) {
+	public void onOpenPagePrompt(WebView view, String url, final Callback<Integer> callback) {
 		LogUtils.i(TAG, "onOpenPagePrompt");
 		Activity mActivity;
 		if ((mActivity = this.mActivity) == null || mActivity.isFinishing()) {
@@ -87,15 +88,15 @@ public class DefaultUIController extends AbsAgentWebUIController {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							if (callback != null) {
-								callback.handleMessage(Message.obtain(null, -1));
+								callback.handleValue(-1);
 							}
 						}
-					})//
+					})
 					.setPositiveButton(mResources.getString(R.string.agentweb_leave), new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							if (callback != null) {
-								callback.handleMessage(Message.obtain(null, 1));
+								callback.handleValue(1);
 							}
 						}
 					})

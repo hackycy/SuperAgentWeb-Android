@@ -23,6 +23,8 @@ import android.os.Message;
 import android.view.KeyEvent;
 import android.webkit.ClientCertRequest;
 import android.webkit.HttpAuthHandler;
+import android.webkit.RenderProcessGoneDetail;
+import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -38,7 +40,7 @@ import androidx.annotation.RequiresApi;
  */
 public class WebViewClientDelegate extends WebViewClient {
 
-    private WebViewClient mDelegate;
+    protected WebViewClient mDelegate;
     private static final String TAG = WebViewClientDelegate.class.getSimpleName();
 
     WebViewClientDelegate(WebViewClient client) {
@@ -258,4 +260,23 @@ public class WebViewClientDelegate extends WebViewClient {
         }
         super.onReceivedLoginRequest(view, realm, account, args);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+        if (mDelegate != null) {
+            mDelegate.onRenderProcessGone(view, detail);
+        }
+        return super.onRenderProcessGone(view, detail);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O_MR1)
+    @Override
+    public void onSafeBrowsingHit(WebView view, WebResourceRequest request, int threatType, SafeBrowsingResponse callback) {
+        if (mDelegate != null) {
+            mDelegate.onSafeBrowsingHit(view, request, threatType, callback);
+        }
+        super.onSafeBrowsingHit(view, request, threatType, callback);
+    }
+
 }

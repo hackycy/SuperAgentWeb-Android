@@ -31,6 +31,7 @@ import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.util.ArrayList;
@@ -217,6 +218,20 @@ public class AgentWebUtils {
             }
         }
         return "";
+    }
+
+    public static Method isExistMethod(Object o, String methodName, Class... clazzs) {
+        if (null == o) {
+            return null;
+        }
+        try {
+            Class clazz = o.getClass();
+            Method mMethod = clazz.getDeclaredMethod(methodName, clazzs);
+            mMethod.setAccessible(true);
+            return mMethod;
+        } catch (Throwable ignore) {}
+        return null;
+
     }
 
     public static int clearCacheFolder(final File dir, final int numDays) {

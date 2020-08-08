@@ -7,6 +7,7 @@ import android.webkit.JsResult;
 import android.webkit.WebView;
 
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
+import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
 /**
@@ -29,7 +30,7 @@ public class AgentWebUIControllerImplBase extends AbsAgentWebUIController {
     }
 
     @Override
-    public void onOpenPagePrompt(WebView view, String url, Handler.Callback callback) {
+    public void onOpenPagePrompt(WebView view, String url, Callback<Integer> callback) {
         getDelegate().onOpenPagePrompt(view, url, callback);
     }
 
