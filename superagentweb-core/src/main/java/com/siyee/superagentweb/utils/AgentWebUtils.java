@@ -2,16 +2,20 @@ package com.siyee.superagentweb.utils;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -53,8 +57,71 @@ public class AgentWebUtils {
 
     private static Handler mHandler = null;
 
+    @SuppressLint("StaticFieldLeak")
+    private static Application sApp;
+
     private AgentWebUtils() {
         throw new UnsupportedOperationException("SuperAgentWebUtils can' t init");
+    }
+
+    /**
+     * Init utils.
+     * <p>Init it in the class of UtilsFileProvider.</p>
+     *
+     * @param app application
+     */
+    public static void init(final Application app) {
+        if (app == null) {
+            Log.e("Utils", "app is null.");
+            return;
+        }
+        if (sApp == null) {
+            sApp = app;
+            return;
+        }
+        if (sApp.equals(app)) return;
+        sApp = app;
+    }
+
+    /**
+     * Return the Application object.
+     * <p>Main process get app by UtilsFileProvider,
+     * and other process get app by reflect.</p>
+     *
+     * @return the Application object
+     */
+    public static Application getApp() {
+        if (sApp == null) throw new NullPointerException("reflect failed.");
+        return sApp;
+    }
+
+    /**
+     * Return whether the intent is available.
+     *
+     * @param intent The intent.
+     * @return {@code true}: yes<br>{@code false}: no
+     */
+    public static boolean isIntentAvailable(final Intent intent) {
+        return getApp()
+                .getPackageManager()
+                .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY)
+                .size() > 0;
+    }
+
+    private static Intent getIntent(final Intent intent, final boolean isNewTask) {
+        return isNewTask ? intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) : intent;
+    }
+
+    /**
+     * Return the intent of launch app details settings.
+     *
+     * @param pkgName The name of the package.
+     * @return the intent of launch app details settings
+     */
+    public static Intent getLaunchAppDetailsSettingsIntent(final String pkgName, final boolean isNewTask) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + pkgName));
+        return getIntent(intent, isNewTask);
     }
 
     public static int dp2px(Context context, float dipValue) {

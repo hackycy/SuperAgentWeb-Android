@@ -31,6 +31,7 @@ import com.siyee.superagentweb.impl.UrlLoaderImpl;
 import com.siyee.superagentweb.impl.VideoImpl;
 import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
+import com.siyee.superagentweb.utils.AgentWebUtils;
 import com.siyee.superagentweb.utils.CookieUtils;
 import com.siyee.superagentweb.widget.BaseIndicatorView;
 import com.siyee.superagentweb.widget.WebParentLayout;
@@ -191,8 +192,13 @@ public class SuperAgentWeb {
         init();
     }
 
+    /**
+     * init
+     */
     private void init() {
-
+        if (this.mActivity != null) {
+            AgentWebUtils.init(mActivity.getApplication());
+        }
     }
 
     /**
