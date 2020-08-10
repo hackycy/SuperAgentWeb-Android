@@ -163,7 +163,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 			return;
 		}
 		mAlertDialog = new AlertDialog.Builder(mActivity)
-				.setSingleChoiceItems(ways, -1, new DialogInterface.OnClickListener() {
+				.setItems(ways, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						dialog.dismiss();
@@ -173,7 +173,6 @@ public class DefaultUIController extends AbsAgentWebUIController {
 							mMessage.what = which;
 							callback.handleMessage(mMessage);
 						}
-
 					}
 				}).setOnCancelListener(new DialogInterface.OnCancelListener() {
 					@Override
@@ -327,7 +326,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 	}
 
 	@Override
-	public void onPermissionsDeny(String[] permissions, String permissionType, String action) {
+	public void onPermissionsDeny(String[] permissions, String action) {
 		AgentWebUtils.toastShowShort(mActivity.getApplicationContext(), mResources.getString(R.string.agentweb_permission_deny_tips));
 	}
 
