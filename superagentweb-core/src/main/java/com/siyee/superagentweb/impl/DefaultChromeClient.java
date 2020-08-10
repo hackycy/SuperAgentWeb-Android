@@ -141,7 +141,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
         if (mPermissionInterceptor != null) {
-            if (mPermissionInterceptor.intercept(this.mWebView.getUrl(), AgentWebPermissions.LOCATION, "location")) {
+            if (mPermissionInterceptor.intercept(this.mWebView.getUrl(), AgentWebPermissions.LOCATION, AgentWebPermissions.ACTION_LOCATION)) {
                 callback.invoke(origin, false, false);
                 return;
             }
