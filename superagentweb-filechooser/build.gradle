@@ -22,4 +22,6 @@ android {
     }
 }
 
-dependencies { }
+dependencies {
+    implementation project(':superagentweb-core')
+}
