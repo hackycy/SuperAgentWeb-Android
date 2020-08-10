@@ -1,3 +1,4 @@
+include ':superagentweb-filechooser'
 include ':superagentweb-core'
 include ':sample'
 rootProject.name = "SuperAgentWeb"
