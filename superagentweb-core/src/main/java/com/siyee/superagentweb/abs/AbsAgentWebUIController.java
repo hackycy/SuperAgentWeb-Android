@@ -144,9 +144,8 @@ public abstract class AbsAgentWebUIController {
      * 当权限被拒回调该方法
      *
      * @param permissions
-     * @param permissionType
      * @param action
      */
-    public abstract void onPermissionsDeny(String[] permissions, String permissionType, String action);
+    public abstract void onPermissionsDeny(String[] permissions, String action);
 
 }

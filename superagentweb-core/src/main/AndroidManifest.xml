@@ -2,6 +2,7 @@
     package="com.siyee.superagentweb">
 
     <application>
+
         <!--   FIleProvider    -->
         <provider
             android:name="com.siyee.superagentweb.AgentWebFileProvider"
@@ -12,6 +13,13 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/web_files_public"/>
         </provider>
+
+        <activity
+            android:name="com.siyee.superagentweb.utils.UtilsTransActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:multiprocess="true"
+            android:theme="@style/SuperAgentWeb_ActivityTranslucent"
+            android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
 
     </application>
 </manifest>

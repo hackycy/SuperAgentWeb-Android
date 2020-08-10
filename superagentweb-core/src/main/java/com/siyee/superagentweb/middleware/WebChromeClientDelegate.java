@@ -282,9 +282,6 @@ public class WebChromeClientDelegate extends WebChromeClient {
 
     @Override
     public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-        /*onConsoleMessage(consoleMessage.message(), consoleMessage.lineNumber(),
-                consoleMessage.sourceId());*/
-
         if (this.mDelegate != null) {
             return this.mDelegate.onConsoleMessage(consoleMessage);
         }
