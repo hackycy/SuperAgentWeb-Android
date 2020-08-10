@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.AppOpsManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.core.os.EnvironmentCompat;
 
 import com.siyee.superagentweb.AgentWebConfig;
@@ -35,13 +37,16 @@ import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static com.siyee.superagentweb.AgentWebConfig.AGENTWEB_CACHE_PATCH;
 
@@ -122,6 +127,29 @@ public class AgentWebUtils {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         intent.setData(Uri.parse("package:" + pkgName));
         return getIntent(intent, isNewTask);
+    }
+
+    public static Intent getIntentCaptureCompat(Context context, File file) {
+        Intent mIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Uri mUri = getUriFromFile(context, file);
+        mIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        mIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+        return mIntent;
+    }
+
+    public static Uri getUriFromFile(Context context, File file) {
+        Uri uri = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            uri = getUriFromFileForN(context, file);
+        } else {
+            uri = Uri.fromFile(file);
+        }
+        return uri;
+    }
+
+    public static Uri getUriFromFileForN(Context context, File file) {
+        Uri fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".AgentWebFileProvider", file);
+        return fileUri;
     }
 
     public static int dp2px(Context context, float dipValue) {
@@ -220,6 +248,36 @@ public class AgentWebUtils {
             }
         }
         return deniedPermissions;
+    }
+
+    public static File createImageFile(Context context) {
+        File mFile = null;
+        try {
+            String timeStamp =
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+            String imageName = String.format("aw_%s.jpg", timeStamp);
+            mFile = createFileByName(context, imageName, true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return mFile;
+    }
+
+    public static File createFileByName(Context context, String name, boolean cover) throws IOException {
+        String path = getAgentWebFilePath(context);
+        if (TextUtils.isEmpty(path)) {
+            return null;
+        }
+        File mFile = new File(path, name);
+        if (mFile.exists()) {
+            if (cover) {
+                mFile.delete();
+                mFile.createNewFile();
+            }
+        } else {
+            mFile.createNewFile();
+        }
+        return mFile;
     }
 
     public static AbsAgentWebUIController getAgentWebUIControllerByWebView(WebView webView) {
