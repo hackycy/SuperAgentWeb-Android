@@ -21,6 +21,10 @@ public final class FileChooserUtils {
 
     private static final String TAG = FileChooserUtils.class.getSimpleName();
 
+    public static final String KEY_URI = "KEY_URI";
+    public static final String KEY_ACTION = "KEY_ACTION";
+    public static final String KEY_FROM_INTENTION = "KEY_FROM_INTENTION";
+    public static final String KEY_FILE_CHOOSER_INTENT = "KEY_FILE_CHOOSER_INTENT";
     private static FileChooserUtils sInstance;
 
     /**
@@ -48,6 +52,11 @@ public final class FileChooserUtils {
         sInstance = this;
     }
 
+    public FileChooserUtils callback(ChooserListener listener) {
+        mChooserListener = listener;
+        return this;
+    }
+
     public void open() {
         if (this.mAction == ACTION_FILE || this.mAction == ACTION_CAMERA
                 || this.mAction == ACTION_VIDEO || this.mAction == ACTION_ALBUM) {
@@ -55,11 +64,6 @@ public final class FileChooserUtils {
             return;
         }
         LogUtils.i(TAG, "No action to open");
-    }
-
-    public FileChooserUtils callback(ChooserListener listener) {
-        mChooserListener = listener;
-        return this;
     }
 
     private void startChooserActivity() {
@@ -71,22 +75,20 @@ public final class FileChooserUtils {
      */
     static final class FileChooserActivityImpl extends UtilsTransActivity.TransActivityDelegate {
 
-        private static final String TYPE = "TYPE";
-
         private static FileChooserActivityImpl INSTANCE = new FileChooserActivityImpl();
 
         private static void start(final int type) {
             UtilsTransActivity.start(new Consumer<Intent>() {
                 @Override
                 public void accept(Intent data) {
-                    data.putExtra(TYPE, type);
+                    data.putExtra(KEY_ACTION, type);
                 }
             }, INSTANCE);
         }
 
         @Override
         public void onCreated(@NonNull UtilsTransActivity activity, @Nullable Bundle savedInstanceState) {
-            int type = activity.getIntent().getIntExtra(TYPE, -1);
+            int type = activity.getIntent().getIntExtra(KEY_ACTION, -1);
             if (type == -1) {
                 cancel(activity);
                 return;
@@ -101,6 +103,20 @@ public final class FileChooserUtils {
             } else {
                 fetchFile(activity);
             }
+        }
+
+        @Override
+        public void onActivityResult(@NonNull UtilsTransActivity activity, int requestCode, int resultCode, Intent data) {
+            if (requestCode == REQUEST_CODE) {
+                chooserActionCallback(activity, resultCode, sInstance.mUri != null ? new Intent().putExtra(KEY_URI, sInstance.mUri) : data);
+            }
+        }
+
+        private void chooserActionCallback(@NonNull UtilsTransActivity activity, int resultCode, Intent data) {
+            if (sInstance.mChooserListener != null) {
+                sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, resultCode, data);
+            }
+            cancel(activity);
         }
 
         /**
@@ -195,8 +211,7 @@ public final class FileChooserUtils {
                     cancel(activity);
                     return;
                 }
-                // TODO KEY_FILE_CHOOSER_INTENT How To Do
-                Intent mIntent = activity.getIntent().getParcelableExtra("KEY_FILE_CHOOSER_INTENT");
+                Intent mIntent = activity.getIntent().getParcelableExtra(KEY_FILE_CHOOSER_INTENT);
                 if (mIntent == null) {
                     cancel(activity);
                     return;
