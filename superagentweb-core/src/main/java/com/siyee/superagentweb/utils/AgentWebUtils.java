@@ -137,6 +137,42 @@ public class AgentWebUtils {
         return mIntent;
     }
 
+    public static Intent getCommonFileIntentCompat(Context context, File file) {
+        Intent mIntent = new Intent().setAction(Intent.ACTION_VIEW);
+        setIntentDataAndType(context, mIntent, getMIMEType(file), file, false);
+        return mIntent;
+    }
+
+    public static Intent getIntentAlbumCompat(Context context, File file) {
+        Intent mIntent = new Intent(Intent.ACTION_PICK);
+        setIntentDataAndType(context, mIntent, getMIMEType(file), file, false);
+        return mIntent;
+    }
+
+    public static Intent getIntentVideoCompat(Context context, File file){
+        Intent mIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        Uri mUri = getUriFromFile(context, file);
+        mIntent.addCategory(Intent.CATEGORY_DEFAULT);
+        mIntent.putExtra(MediaStore.EXTRA_OUTPUT, mUri);
+        return mIntent;
+    }
+
+    private static void setIntentDataAndType(Context context,
+                                             Intent intent,
+                                             String type,
+                                             File file,
+                                             boolean writeAble) {
+        if (Build.VERSION.SDK_INT >= 24) {
+            intent.setDataAndType(getUriFromFile(context, file), type);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if (writeAble) {
+                intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            }
+        } else {
+            intent.setDataAndType(Uri.fromFile(file), type);
+        }
+    }
+
     public static Uri getUriFromFile(Context context, File file) {
         Uri uri = null;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -148,8 +184,8 @@ public class AgentWebUtils {
     }
 
     public static Uri getUriFromFileForN(Context context, File file) {
-        Uri fileUri = FileProvider.getUriForFile(context, context.getPackageName() + ".AgentWebFileProvider", file);
-        return fileUri;
+        // AndroidManifest.xml -> authorities
+        return FileProvider.getUriForFile(context, context.getPackageName() + ".AgentWebFileProvider", file);
     }
 
     public static int dp2px(Context context, float dipValue) {
@@ -212,50 +248,25 @@ public class AgentWebUtils {
         return type;
     }
 
-    public static boolean hasPermission(@NonNull Context context, @NonNull String... permissions) {
-        return hasPermission(context, Arrays.asList(permissions));
-    }
-
-    public static boolean hasPermission(@NonNull Context context, @NonNull List<String> permissions) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        for (String permission : permissions) {
-            int result = ContextCompat.checkSelfPermission(context, permission);
-            if (result == PackageManager.PERMISSION_DENIED) {
-                return false;
-            }
-            String op = AppOpsManagerCompat.permissionToOp(permission);
-            if (TextUtils.isEmpty(op)) {
-                continue;
-            }
-            result = AppOpsManagerCompat.noteProxyOp(context, op, context.getPackageName());
-            if (result != AppOpsManagerCompat.MODE_ALLOWED) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    public static List<String> getDeniedPermissions(Activity activity, String[] permissions) {
-        if (permissions == null || permissions.length == 0) {
-            return null;
-        }
-        List<String> deniedPermissions = new ArrayList<>();
-        for (int i = 0; i < permissions.length; i++) {
-            if (!hasPermission(activity, permissions[i])) {
-                deniedPermissions.add(permissions[i]);
-            }
-        }
-        return deniedPermissions;
-    }
-
     public static File createImageFile(Context context) {
         File mFile = null;
         try {
             String timeStamp =
                     new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
             String imageName = String.format("aw_%s.jpg", timeStamp);
+            mFile = createFileByName(context, imageName, true);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return mFile;
+    }
+
+    public static File createVideoFile(Context context){
+        File mFile = null;
+        try {
+            String timeStamp =
+                    new SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault()).format(new Date());
+            String imageName = String.format("aw_%s.mp4", timeStamp);  //默认生成mp4
             mFile = createFileByName(context, imageName, true);
         } catch (Throwable e) {
             e.printStackTrace();
