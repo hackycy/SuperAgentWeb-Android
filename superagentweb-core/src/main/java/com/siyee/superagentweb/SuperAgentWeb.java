@@ -11,6 +11,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.siyee.superagentweb.abs.AbsAgentWebSettings;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.EventInterceptor;
 import com.siyee.superagentweb.abs.IAgentWebSettings;
@@ -24,6 +25,9 @@ import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.abs.WebCreator;
 import com.siyee.superagentweb.abs.WebListenerManager;
 import com.siyee.superagentweb.impl.AgentWebUIControllerImplBase;
+import com.siyee.superagentweb.impl.DefaultAgentWebSettings;
+import com.siyee.superagentweb.impl.DefaultChromeClient;
+import com.siyee.superagentweb.impl.DefaultWebClient;
 import com.siyee.superagentweb.impl.DefaultWebCreator;
 import com.siyee.superagentweb.impl.DefaultWebLifeCycleImpl;
 import com.siyee.superagentweb.impl.EventHandlerImpl;
@@ -33,6 +37,7 @@ import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
 import com.siyee.superagentweb.utils.AgentWebUtils;
 import com.siyee.superagentweb.utils.CookieUtils;
+import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.widget.BaseIndicatorView;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
@@ -207,6 +212,22 @@ public class SuperAgentWeb {
      */
     private SuperAgentWeb ready() {
         CookieUtils.initCookiesManager(mActivity.getApplicationContext());
+        IAgentWebSettings agentWebSettings = this.mAgentWebSettings;
+        if (agentWebSettings == null) {
+            this.mAgentWebSettings = agentWebSettings = new DefaultAgentWebSettings();
+        }
+        if (agentWebSettings instanceof AbsAgentWebSettings) {
+            ((AbsAgentWebSettings) agentWebSettings).bindAgentWeb(this);
+        }
+        if (this.mWebListenerManager == null && agentWebSettings instanceof AbsAgentWebSettings) {
+            mWebListenerManager = (WebListenerManager) agentWebSettings;
+        }
+        agentWebSettings.toSetting(mWebCreator.getWebView());
+        if (mWebListenerManager != null) {
+            mWebListenerManager.setDownloader(mWebCreator.getWebView(), null);
+            mWebListenerManager.setWebChromeClient(mWebCreator.getWebView(), getWebChromeClient());
+            mWebListenerManager.setWebViewClient(mWebCreator.getWebView(), getWebViewClient());
+        }
         return this;
     }
 
@@ -237,11 +258,81 @@ public class SuperAgentWeb {
     }
 
     /**
-     * get real WebViewClient
+     * get top WebViewClient
      * @return
      */
     private android.webkit.WebViewClient getWebViewClient() {
-        return null;
+        LogUtils.i(TAG, "getDelegate:" + this.mMiddleWrareWebClientBaseHeader);
+        DefaultWebClient defaultWebClient = DefaultWebClient.createBuilder()
+                .setActivity(this.mActivity)
+                .setWebClientHelper(this.mWebClientHelper)
+                .setWebView(this.mWebCreator.getWebView())
+                .setInterceptUnkownUrl(this.mIsInterceptUnkownUrl)
+                .setOpenOtherPageWays(this.mOpenOtherPageWays)
+                .build();
+        MiddlewareWebClientBase header = this.mMiddleWrareWebClientBaseHeader;
+        if (this.mWebViewClient != null) {
+            this.mWebViewClient.enq(this.mMiddleWrareWebClientBaseHeader);
+            header = this.mWebViewClient;
+        }
+        if (header != null) {
+            MiddlewareWebClientBase tail = header;
+            int count = 1;
+            MiddlewareWebClientBase tmp = header;
+            while (tmp.next() != null) {
+                tail = tmp = tmp.next();
+                count++;
+            }
+            LogUtils.i(TAG, "MiddlewareWebClientBase middleware count:" + count);
+            tail.setDelegate(defaultWebClient);
+            return header;
+        } else {
+            return defaultWebClient;
+        }
+    }
+
+    /**
+     * get top WebChromeClient
+     * @return
+     */
+    private android.webkit.WebChromeClient getWebChromeClient() {
+        IndicatorController mIndicatorController =
+                (this.mIndicatorController == null) ?
+                        IndicatorHandler.getInstance().inJectIndicator(mWebCreator.offer())
+                        : this.mIndicatorController;
+        DefaultChromeClient defaultChromeClient =
+                new DefaultChromeClient(this.mActivity,
+                        this.mIndicatorController = mIndicatorController,
+                        null, this.mIVideo = getIVideo(),
+                        this.mPermissionInterceptor, mWebCreator.getWebView());
+        LogUtils.i(TAG, "WebChromeClient:" + this.mWebChromeClient);
+        MiddlewareWebChromeBase header = this.mMiddlewareWebChromeBaseHeader;
+        if (this.mWebChromeClient != null) {
+            this.mWebChromeClient.enq(header);
+            header = this.mWebChromeClient;
+        }
+        if (header != null) {
+            MiddlewareWebChromeBase tail = header;
+            int count = 1;
+            MiddlewareWebChromeBase tmp = header;
+            for (; tmp.next() != null; ) {
+                tail = tmp = tmp.next();
+                count++;
+            }
+            LogUtils.i(TAG, "MiddlewareWebClientBase middleware count:" + count);
+            tail.setDelegate(defaultChromeClient);
+            return header;
+        } else {
+            return defaultChromeClient;
+        }
+    }
+
+    /**
+     * Video
+     * @return
+     */
+    private IVideo getIVideo() {
+        return mIVideo == null ? new VideoImpl(mActivity, mWebCreator.getWebView()) : mIVideo;
     }
 
     /**

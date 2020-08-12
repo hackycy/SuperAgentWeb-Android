@@ -149,7 +149,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
         }
         return true;
     }
-    
+
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
         try {

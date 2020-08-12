@@ -41,7 +41,7 @@ public abstract class AbsAgentWebSettings implements IAgentWebSettings, WebListe
 
     public AbsAgentWebSettings() {}
 
-    final void bindAgentWeb(SuperAgentWeb superAgentWeb) {
+    public final void bindAgentWeb(SuperAgentWeb superAgentWeb) {
         this.mSuperAgentWeb = superAgentWeb;
         this.bindAgentWebSupport(superAgentWeb);
     }
