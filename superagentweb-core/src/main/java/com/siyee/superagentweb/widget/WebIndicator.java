@@ -17,8 +17,8 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.Nullable;
 
 import com.siyee.superagentweb.abs.BaseIndicatorSpec;
-import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.LogUtils;
 
 /**
  * @author hackycy
