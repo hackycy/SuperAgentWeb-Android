@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 
 import com.siyee.superagentweb.abs.Consumer;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
+import com.siyee.superagentweb.filechooser.FileChooser;
 
 import java.io.File;
 
@@ -41,7 +42,7 @@ public final class FileChooserUtils {
     public static final int ACTION_ALBUM = 0x03;
     public static final int ACTION_VIDEO = 0x04;
 
-    public final static int REQUEST_CODE = 0x234;
+    public static final int REQUEST_CODE = 0x234;
 
     private int mAction = -1;
     private String mAcceptType = "*/*";
@@ -103,7 +104,6 @@ public final class FileChooserUtils {
      * @param permissionInterceptor
      * @param valueCallback
      * @param mimeType
-     * @param jsChannelCallback
      * @return
      */
     public static boolean showFileChooserCompat(Activity activity,
@@ -112,9 +112,25 @@ public final class FileChooserUtils {
                                                 WebChromeClient.FileChooserParams fileChooserParams,
                                                 PermissionInterceptor permissionInterceptor,
                                                 ValueCallback valueCallback,
-                                                String mimeType,
-                                                Handler.Callback jsChannelCallback) {
-
+                                                String mimeType) {
+        FileChooser.Builder builder = FileChooser.newBuilder(activity, webView);
+        if (valueCallbacks != null) {
+            builder.setUriValueCallbacks(valueCallbacks);
+        }
+        if (valueCallback != null) {
+            builder.setUriValueCallback(valueCallback);
+        }
+        if (fileChooserParams != null) {
+            builder.setFileChooserParams(fileChooserParams);
+        }
+        if (permissionInterceptor != null) {
+            builder.setPermissionInterceptor(permissionInterceptor);
+        }
+        if (!TextUtils.isEmpty(mimeType)) {
+            builder.setAcceptType(mimeType);
+        }
+        FileChooser fileChooser = builder.build();
+        fileChooser.startChooser();
         return true;
     }
 

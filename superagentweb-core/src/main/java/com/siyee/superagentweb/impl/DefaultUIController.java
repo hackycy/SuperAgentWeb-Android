@@ -154,7 +154,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 	}
 
 	@Override
-	public void onSelectItemsPrompt(WebView view, String url, final String[] ways, final Handler.Callback callback) {
+	public void onSelectItemsPrompt(WebView view, String url, final String[] ways, final Callback<Integer> callback) {
 		Activity mActivity;
 		if ((mActivity = this.mActivity) == null || mActivity.isFinishing()) {
 			return;
@@ -169,9 +169,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 						dialog.dismiss();
 						LogUtils.i(TAG, "which:" + which);
 						if (callback != null) {
-							Message mMessage = Message.obtain();
-							mMessage.what = which;
-							callback.handleMessage(mMessage);
+							callback.handleValue(which);
 						}
 					}
 				}).setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -179,7 +177,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 					public void onCancel(DialogInterface dialog) {
 						dialog.dismiss();
 						if (callback != null) {
-							callback.handleMessage(Message.obtain(null, -1));
+							callback.handleValue(-1);
 						}
 					}
 				}).create();

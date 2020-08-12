@@ -12,6 +12,7 @@
     <string name="agentweb_click_open">点击打开</string>
     <string name="agentweb_coming_soon_download">即将开始下载文件</string>
     <string name="agentweb_camera">相机</string>
+    <string name="agentweb_album">图库</string>
     <string name="agentweb_file_chooser">文件</string>
     <string name="agentweb_loading">加载中 …</string>
     <string name="agentweb_leave_app_and_go_other_page">您需要离开%s前往其他应用吗？</string>

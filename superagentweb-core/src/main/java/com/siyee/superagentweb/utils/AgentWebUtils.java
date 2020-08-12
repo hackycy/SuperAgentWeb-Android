@@ -22,6 +22,7 @@ import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -138,19 +139,21 @@ public class AgentWebUtils {
         return mIntent;
     }
 
-    public static Intent getCommonFileIntentCompat(Context context, String acceptType) {
-//        Intent mIntent = null;
-//        if (mIsAboveLollipop && mFileChooserParams != null && (mIntent = mFileChooserParams.createIntent()) != null) {
-//            // 多选
-//			/*if (mFileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE) {
-//			    mIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-//            }*/
-////			mIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mIntent.getAction().equals(Intent.ACTION_GET_CONTENT)) {
-//                mIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-//            }
-//            return mIntent;
-//        }
+    public static Intent getCommonFileIntentCompat(boolean isAboveLollipop,
+                                                   WebChromeClient.FileChooserParams fileChooserParams,
+                                                   String acceptType) {
+        Intent mIntent = null;
+        if (isAboveLollipop && fileChooserParams != null && (mIntent = fileChooserParams.createIntent()) != null) {
+            // 多选
+			/*if (mFileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE) {
+			    mIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            }*/
+//			mIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mIntent.getAction().equals(Intent.ACTION_GET_CONTENT)) {
+                mIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+            }
+            return mIntent;
+        }
 
         Intent i = new Intent();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -165,7 +168,7 @@ public class AgentWebUtils {
             i.setType(acceptType);
         }
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        return Intent.createChooser(i, "");
+        return mIntent = Intent.createChooser(i, "");
     }
 
     /**

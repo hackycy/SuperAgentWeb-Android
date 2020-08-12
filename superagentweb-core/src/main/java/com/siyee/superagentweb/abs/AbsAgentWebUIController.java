@@ -86,7 +86,7 @@ public abstract class AbsAgentWebUIController {
      */
     public abstract void onJsConfirm(WebView view, String url, String message, JsResult jsResult);
 
-    public abstract void onSelectItemsPrompt(WebView view, String url, String[] ways, Handler.Callback callback);
+    public abstract void onSelectItemsPrompt(WebView view, String url, String[] ways, Callback<Integer> callback);
 
     /**
      * 强制下载弹窗
