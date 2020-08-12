@@ -1,8 +1,14 @@
 package com.siyee.superagentweb.filechooser;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
+import android.text.TextUtils;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -19,6 +25,7 @@ import com.siyee.superagentweb.utils.AgentWebUtils;
 import com.siyee.superagentweb.utils.FileChooserUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -77,11 +84,13 @@ public class FileChooser {
     /**
      * FROM_INTENTION_CODE 用于表示当前Action
      * 11 >> 1 -> Camera
-     * 11 >> 2 -> Album -> Default
+     * 11 >> 2 -> Album
+     * 11 >> 3 -> Files -> Default
      */
-    private int mCurrentFromIntentCode = 11 >> 3;
-    private static final int FROM_INTENT_CODE_CAMERA = 11 >> 1;
-    private static final int FROM_INTENT_CODE_ALBUM = 11 >> 2;
+    private int mCurrentFromIntentCode = FROM_INTENT_CODE_FILES;
+    public static final int FROM_INTENT_CODE_CAMERA = 11 >> 1;
+    public static final int FROM_INTENT_CODE_ALBUM = 11 >> 2;
+    public static final int FROM_INTENT_CODE_FILES = 11 >> 3;
 
     /**
      * 权限拦截
@@ -169,7 +178,7 @@ public class FileChooser {
 
         //5.0以上系统通过input标签获取文件
         if (mIsAboveLollipop) {
-//            aboveLollipopCheckFilesAndCallback(mCameraState ? new Uri[]{data.getParcelableExtra(KEY_URI)} : processData(data), mCameraState);
+            aboveLollipopCheckFilesAndCallback(mCameraState ? new Uri[]{data.getParcelableExtra(KEY_URI)} : processData(data), mCameraState);
             return;
         }
 
@@ -182,9 +191,167 @@ public class FileChooser {
         if (mCameraState) {
             mUriValueCallback.onReceiveValue((Uri) data.getParcelableExtra(KEY_URI));
         } else {
-//            belowLollipopUriCallback(data);
+            belowLollipopUriCallback(data);
         }
 
+        /*if (mIsAboveLollipop)
+            aboveLollipopCheckFilesAndCallback(mCameraState ? new Uri[]{data.getParcelableExtra(KEY_URI)} : processData(data));
+        else if (mJsChannel)
+            convertFileAndCallback(mCameraState ? new Uri[]{data.getParcelableExtra(KEY_URI)} : processData(data));
+        else {
+            if (mCameraState && mUriValueCallback != null)
+                mUriValueCallback.onReceiveValue((Uri) data.getParcelableExtra(KEY_URI));
+            else
+                belowLollipopUriCallback(data);
+        }*/
+    }
+
+    private Uri[] processData(Intent data) {
+        Uri[] datas = null;
+        if (data == null) {
+            return datas;
+        }
+        String target = data.getDataString();
+        if (!TextUtils.isEmpty(target)) {
+            return datas = new Uri[]{ Uri.parse(target) };
+        }
+        ClipData mClipData = data.getClipData();
+        if (mClipData != null && mClipData.getItemCount() > 0) {
+            datas = new Uri[mClipData.getItemCount()];
+            for (int i = 0; i < mClipData.getItemCount(); i++) {
+                ClipData.Item mItem = mClipData.getItemAt(i);
+                datas[i] = mItem.getUri();
+            }
+        }
+        return datas;
+    }
+
+    /**
+     * 经过多次的测试，在小米 MIUI ， 华为 ，多部分为 Android 6.0 左右系统相机获取到的文件
+     * length为0 ，导致前端 ，获取到的文件， 作预览的时候不正常 ，等待5S左右文件又正常了 ， 所以这里做了阻塞等待处理，
+     *
+     * @param datas
+     * @param isCamera
+     */
+    private void aboveLollipopCheckFilesAndCallback(final Uri[] datas, boolean isCamera) {
+        if (mUriValueCallbacks == null) {
+            return;
+        }
+        if (!isCamera) {
+            mUriValueCallbacks.onReceiveValue(datas == null ? new Uri[]{} : datas);
+            return;
+        }
+
+        if (mAgentWebUIController.get() == null) {
+            mUriValueCallbacks.onReceiveValue(null);
+            return;
+        }
+        String[] paths = AgentWebUtils.uriToPath(mActivity, datas);
+        if (paths == null || paths.length == 0) {
+            mUriValueCallbacks.onReceiveValue(null);
+            return;
+        }
+        final String path = paths[0];
+        mAgentWebUIController.get().onLoading(mActivity.getString(R.string.agentweb_loading));
+        AsyncTask.THREAD_POOL_EXECUTOR.execute(new WaitPhotoRunnable(path, new AboveLCallback(mUriValueCallbacks, datas, mAgentWebUIController)));
+
+    }
+
+    private static final class AboveLCallback implements Handler.Callback {
+        private ValueCallback<Uri[]> mValueCallback;
+        private Uri[] mUris;
+        private WeakReference<AbsAgentWebUIController> controller;
+
+        private AboveLCallback(ValueCallback<Uri[]> valueCallbacks, Uri[] uris, WeakReference<AbsAgentWebUIController> controller) {
+            this.mValueCallback = valueCallbacks;
+            this.mUris = uris;
+            this.controller = controller;
+        }
+
+        @Override
+        public boolean handleMessage(final Message msg) {
+
+            AgentWebUtils.runOnUIThread(new Runnable() {
+                @Override
+                public void run() {
+                    FileChooser.AboveLCallback.this.safeHandleMessage(msg);
+                }
+            });
+            return false;
+        }
+
+        private void safeHandleMessage(Message msg) {
+            if (mValueCallback != null) {
+                mValueCallback.onReceiveValue(mUris);
+            }
+            if (controller != null && controller.get() != null) {
+                controller.get().onCancelLoading();
+            }
+        }
+    }
+
+    private static final class WaitPhotoRunnable implements Runnable {
+        private String path;
+        private Handler.Callback mCallback;
+
+        private WaitPhotoRunnable(String path, Handler.Callback callback) {
+            this.path = path;
+            this.mCallback = callback;
+        }
+
+        @Override
+        public void run() {
+
+            if (TextUtils.isEmpty(path) || !new File(path).exists()) {
+                if (mCallback != null) {
+                    mCallback.handleMessage(Message.obtain(null, -1));
+                }
+                return;
+            }
+            int ms = 0;
+
+            while (ms <= MAX_WAIT_PHOTO_MS) {
+
+                ms += 300;
+                SystemClock.sleep(300);
+                File mFile = new File(path);
+                if (mFile.length() > 0) {
+
+                    if (mCallback != null) {
+                        mCallback.handleMessage(Message.obtain(null, 1));
+                        mCallback = null;
+                    }
+                    break;
+                }
+
+            }
+
+            if (ms > MAX_WAIT_PHOTO_MS) {
+                if (mCallback != null) {
+                    mCallback.handleMessage(Message.obtain(null, -1));
+                }
+            }
+            mCallback = null;
+            path = null;
+
+        }
+    }
+
+    /**
+     * Lollipop以下的处理
+     * @param data
+     */
+    private void belowLollipopUriCallback(Intent data) {
+        if (data == null) {
+            if (mUriValueCallback != null) {
+                mUriValueCallback.onReceiveValue(Uri.EMPTY);
+            }
+            return;
+        }
+        Uri mUri = data.getData();
+        if (mUriValueCallback != null) {
+            mUriValueCallback.onReceiveValue(mUri);
+        }
     }
 
     /**
@@ -216,11 +383,20 @@ public class FileChooser {
             }
         } else if (this.mCurrentFromIntentCode == FROM_INTENT_CODE_ALBUM) {
             if (isGranted) {
-                openAlbumAction();
+                openAlbumAction(this.mVideoState);
             } else {
                 cancel();
                 if (null != this.mAgentWebUIController.get()) {
-                    this.mAgentWebUIController.get().onPermissionsDeny(AgentWebPermissions.CAMERA, AgentWebPermissions.ACTION_CAMERA);
+                    this.mAgentWebUIController.get().onPermissionsDeny(AgentWebPermissions.STORAGE, AgentWebPermissions.ACTION_STORAGE);
+                }
+            }
+        } else if (this.mCurrentFromIntentCode == FROM_INTENT_CODE_FILES) {
+            if (isGranted) {
+                openFilesAction();
+            } else {
+                cancel();
+                if (null != this.mAgentWebUIController.get()) {
+                    this.mAgentWebUIController.get().onPermissionsDeny(AgentWebPermissions.STORAGE, AgentWebPermissions.ACTION_STORAGE);
                 }
             }
         }
@@ -232,7 +408,7 @@ public class FileChooser {
      * 1 -> Cemera
      * 2 -> Album
      * 3 -> Files
-     * -1 -> Cancel
+     * -1 Or Other -> Cancel
      * @return
      */
     private Callback<Integer> getCallback() {
@@ -241,6 +417,7 @@ public class FileChooser {
             public void handleValue(Integer value) {
                 switch (value) {
                     case 1:
+                        mCameraState = true;
                         if (mAcceptType.contains("video/")) {
                             openCameraAction(true);
                         } else {
@@ -248,7 +425,12 @@ public class FileChooser {
                         }
                         break;
                     case 2:
-                        openAlbumAction();
+                        mCameraState = false;
+                        if (mAcceptType.contains("video/")) {
+                            openAlbumAction(true);
+                        } else {
+                            openAlbumAction(false);
+                        }
                         break;
                     case 3:
                         openFilesAction();
@@ -289,7 +471,7 @@ public class FileChooser {
     /**
      * 打开图库
      */
-    private void openAlbumAction() {
+    private void openAlbumAction(boolean videoState) {
         if (this.mActivity == null) {
             cancel();
             return;
@@ -299,8 +481,10 @@ public class FileChooser {
             cancel();
             return;
         }
+        this.mVideoState = videoState;
         if (PermissionUtils.isGranted(AgentWebPermissions.STORAGE)) {
-            FileChooserUtils.chooser(FileChooserUtils.ACTION_ALBUM).callback(mChooserListener).open();
+            String acceptType = videoState ? "video/*" : "image/*";
+            FileChooserUtils.chooser(FileChooserUtils.ACTION_ALBUM, acceptType).callback(mChooserListener).open();
         } else {
             this.mCurrentFromIntentCode = FROM_INTENT_CODE_ALBUM;
             PermissionUtils.permission(AgentWebPermissions.STORAGE).callback(mPermissionListener).request();
@@ -311,10 +495,24 @@ public class FileChooser {
      * 打开文件选择器
      */
     private void openFilesAction() {
-        FileChooserUtils.chooser(FileChooserUtils.ACTION_FILE,
-                AgentWebUtils.getCommonFileIntentCompat(this.mIsAboveLollipop, this.mFileChooserParams, this.mAcceptType))
-                .callback(mChooserListener)
-                .open();
+        if (this.mActivity == null) {
+            cancel();
+            return;
+        }
+        if (this.mPermissionInterceptor != null &&
+                this.mPermissionInterceptor.intercept(this.mWebView.getUrl(), AgentWebPermissions.STORAGE, AgentWebPermissions.ACTION_STORAGE)) {
+            cancel();
+            return;
+        }
+        if (PermissionUtils.isGranted(AgentWebPermissions.STORAGE)) {
+            FileChooserUtils.chooser(FileChooserUtils.ACTION_FILE,
+                    AgentWebUtils.getCommonFileIntentCompat(this.mIsAboveLollipop, this.mFileChooserParams, this.mAcceptType))
+                    .callback(mChooserListener)
+                    .open();
+        } else {
+            this.mCurrentFromIntentCode = FROM_INTENT_CODE_FILES;
+            PermissionUtils.permission(AgentWebPermissions.STORAGE).callback(mPermissionListener).request();
+        }
     }
 
     /**
