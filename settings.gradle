@@ -1,3 +1,4 @@
+include ':downloader'
 include ':superagentweb-core'
 include ':sample'
 rootProject.name = "SuperAgentWeb"
