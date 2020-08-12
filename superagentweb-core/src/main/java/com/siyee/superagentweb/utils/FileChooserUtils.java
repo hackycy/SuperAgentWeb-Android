@@ -107,11 +107,11 @@ public final class FileChooserUtils {
      */
     public static boolean showFileChooserCompat(Activity activity,
                                                 WebView webView,
-                                                ValueCallback<Uri[]> valueCallbacks,
-                                                WebChromeClient.FileChooserParams fileChooserParams,
-                                                PermissionInterceptor permissionInterceptor,
-                                                ValueCallback valueCallback,
-                                                String mimeType) {
+                                                @Nullable ValueCallback<Uri[]> valueCallbacks,
+                                                @Nullable WebChromeClient.FileChooserParams fileChooserParams,
+                                                @Nullable PermissionInterceptor permissionInterceptor,
+                                                @Nullable ValueCallback valueCallback,
+                                                @Nullable String mimeType) {
         FileChooser.Builder builder = FileChooser.newBuilder(activity, webView);
         if (valueCallbacks != null) {
             builder.setUriValueCallbacks(valueCallbacks);

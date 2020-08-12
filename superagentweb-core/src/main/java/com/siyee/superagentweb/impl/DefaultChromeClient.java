@@ -1,17 +1,21 @@
 package com.siyee.superagentweb.impl;
 
 import android.app.Activity;
+import android.net.Uri;
+import android.os.Build;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.siyee.superagentweb.AgentWebConfig;
 import com.siyee.superagentweb.AgentWebPermissions;
@@ -21,15 +25,23 @@ import com.siyee.superagentweb.abs.IndicatorController;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
 import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.FileChooserUtils;
+import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
 import java.util.List;
 
 /**
  * @author hackycy
  */
 public class DefaultChromeClient extends MiddlewareWebChromeBase {
+
+    /**
+     * DefaultChromeClient 's TAG
+     */
+    private String TAG = DefaultChromeClient.class.getSimpleName();
 
     /**
      * Activity
@@ -137,6 +149,20 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
         }
         return true;
     }
+    
+    @Override
+    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        try {
+            if (this.mAgentWebUIController.get() != null) {
+                this.mAgentWebUIController.get().onJsPrompt(view, url, message, defaultValue, result);
+            }
+        } catch (Exception e) {
+            if (AgentWebConfig.DEBUG) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
 
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
@@ -193,18 +219,54 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
-    public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
-        try {
-            if (this.mAgentWebUIController.get() != null) {
-                this.mAgentWebUIController.get().onJsPrompt(view, url, message, defaultValue, result);
-            }
-        } catch (Exception e) {
-            if (AgentWebConfig.DEBUG) {
-                e.printStackTrace();
-            }
+    public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+        return openFileChooserAboveL(webView, filePathCallback, fileChooserParams);
+    }
+
+    @Override
+    public void openFileChooser(ValueCallback<Uri> uploadFile, String acceptType, String capture) {
+        createAndOpenCommonFileChooser(uploadFile, acceptType);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private boolean openFileChooserAboveL(WebView webView, ValueCallback<Uri[]> valueCallbacks, FileChooserParams fileChooserParams) {
+        LogUtils.i(TAG, "fileChooserParams:" + Arrays.toString(fileChooserParams.getAcceptTypes())
+                + "  getTitle:" + fileChooserParams.getTitle() + " accept:"
+                + Arrays.toString(fileChooserParams.getAcceptTypes()) + " length:"
+                + fileChooserParams.getAcceptTypes().length + "  :"
+                + fileChooserParams.isCaptureEnabled() + "  "
+                + fileChooserParams.getFilenameHint() + "  intent:"
+                + fileChooserParams.createIntent().toString() + "   mode:" + fileChooserParams.getMode());
+        Activity mActivity = this.mActivityWeakReference.get();
+        if (mActivity == null || mActivity.isFinishing()) {
+            return false;
         }
-        return true;
+        return FileChooserUtils.showFileChooserCompat(mActivity,
+                mWebView,
+                valueCallbacks,
+                fileChooserParams,
+                this.mPermissionInterceptor,
+                null,
+                null
+        );
+    }
+
+    private void createAndOpenCommonFileChooser(ValueCallback valueCallback, String mimeType) {
+        Activity mActivity = this.mActivityWeakReference.get();
+        if (mActivity == null || mActivity.isFinishing()) {
+            valueCallback.onReceiveValue(new Object());
+            return;
+        }
+        FileChooserUtils.showFileChooserCompat(mActivity,
+                mWebView,
+                null,
+                null,
+                this.mPermissionInterceptor,
+                valueCallback,
+                mimeType
+        );
     }
 
     @Override
