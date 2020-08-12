@@ -26,6 +26,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.AppOpsManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -137,15 +138,48 @@ public class AgentWebUtils {
         return mIntent;
     }
 
-    public static Intent getCommonFileIntentCompat(Context context, File file) {
-        Intent mIntent = new Intent().setAction(Intent.ACTION_VIEW);
-        setIntentDataAndType(context, mIntent, getMIMEType(file), file, false);
-        return mIntent;
+    public static Intent getCommonFileIntentCompat(Context context, String acceptType) {
+//        Intent mIntent = null;
+//        if (mIsAboveLollipop && mFileChooserParams != null && (mIntent = mFileChooserParams.createIntent()) != null) {
+//            // 多选
+//			/*if (mFileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE) {
+//			    mIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+//            }*/
+////			mIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && mIntent.getAction().equals(Intent.ACTION_GET_CONTENT)) {
+//                mIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+//            }
+//            return mIntent;
+//        }
+
+        Intent i = new Intent();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            i.setAction(Intent.ACTION_OPEN_DOCUMENT);
+        } else {
+            i.setAction(Intent.ACTION_GET_CONTENT);
+        }
+        i.addCategory(Intent.CATEGORY_OPENABLE);
+        if (TextUtils.isEmpty(acceptType)) {
+            i.setType("*/*");
+        } else {
+            i.setType(acceptType);
+        }
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        return Intent.createChooser(i, "");
     }
 
-    public static Intent getIntentAlbumCompat(Context context, File file) {
+    /**
+     * type is image/* or video/*
+     * @param context
+     * @param acceptType
+     * @return
+     */
+    public static Intent getIntentAlbumCompat(Context context, @Nullable String acceptType) {
         Intent mIntent = new Intent(Intent.ACTION_PICK);
-        setIntentDataAndType(context, mIntent, getMIMEType(file), file, false);
+        if (TextUtils.isEmpty(acceptType)) {
+            acceptType = "image/*";
+        }
+        mIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, acceptType);
         return mIntent;
     }
 

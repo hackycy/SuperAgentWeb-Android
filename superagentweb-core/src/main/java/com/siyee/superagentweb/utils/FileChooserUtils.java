@@ -4,11 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
+import android.webkit.ValueCallback;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.siyee.superagentweb.abs.Consumer;
+import com.siyee.superagentweb.abs.PermissionInterceptor;
 
 import java.io.File;
 
@@ -23,7 +29,7 @@ public final class FileChooserUtils {
 
     public static final String KEY_URI = "KEY_URI";
     public static final String KEY_ACTION = "KEY_ACTION";
-    public static final String KEY_FROM_INTENTION = "KEY_FROM_INTENTION";
+    public static final String KEY_FILE_CHOOSER_TYPE = "KEY_FILE_CHOOSER_TYPE";
     public static final String KEY_FILE_CHOOSER_INTENT = "KEY_FILE_CHOOSER_INTENT";
     private static FileChooserUtils sInstance;
 
@@ -38,25 +44,47 @@ public final class FileChooserUtils {
     public final static int REQUEST_CODE = 0x234;
 
     private int mAction = -1;
+    private String mAcceptType = "*/*";
+    private Intent mChooserIntent = null;
 
     private Uri mUri;
 
     private ChooserListener mChooserListener;
 
     public static FileChooserUtils chooser(int action) {
-        return new FileChooserUtils(action);
+        return new FileChooserUtils(action, null, null);
     }
 
-    private FileChooserUtils(int action) {
+    public static FileChooserUtils chooser(int action, Intent chooserIntent) {
+        return new FileChooserUtils(action, null, chooserIntent);
+    }
+
+    public static FileChooserUtils chooser(int action, String acceptType) {
+        return new FileChooserUtils(action, acceptType, null);
+    }
+
+    private FileChooserUtils(@NonNull int action, @Nullable String acceptType, @Nullable Intent chooserIntent) {
         this.mAction = action;
+        if (!TextUtils.isEmpty(acceptType)) {
+            this.mAcceptType = acceptType;
+        }
+        this.mChooserIntent = chooserIntent;
         sInstance = this;
     }
 
+    /**
+     * Set ChooserListener
+     * @param listener
+     * @return
+     */
     public FileChooserUtils callback(ChooserListener listener) {
         mChooserListener = listener;
         return this;
     }
 
+    /**
+     * Start Chooser
+     */
     public void open() {
         if (this.mAction == ACTION_FILE || this.mAction == ACTION_CAMERA
                 || this.mAction == ACTION_VIDEO || this.mAction == ACTION_ALBUM) {
@@ -66,8 +94,32 @@ public final class FileChooserUtils {
         LogUtils.i(TAG, "No action to open");
     }
 
+    /**
+     * showFileChooser
+     * @param activity
+     * @param webView
+     * @param valueCallbacks
+     * @param fileChooserParams
+     * @param permissionInterceptor
+     * @param valueCallback
+     * @param mimeType
+     * @param jsChannelCallback
+     * @return
+     */
+    public static boolean showFileChooserCompat(Activity activity,
+                                                WebView webView,
+                                                ValueCallback<Uri[]> valueCallbacks,
+                                                WebChromeClient.FileChooserParams fileChooserParams,
+                                                PermissionInterceptor permissionInterceptor,
+                                                ValueCallback valueCallback,
+                                                String mimeType,
+                                                Handler.Callback jsChannelCallback) {
+
+        return true;
+    }
+
     private void startChooserActivity() {
-        FileChooserActivityImpl.start(this.mAction);
+        FileChooserActivityImpl.start(this.mAction, this.mAcceptType, this.mChooserIntent);
     }
 
     /**
@@ -77,11 +129,13 @@ public final class FileChooserUtils {
 
         private static FileChooserActivityImpl INSTANCE = new FileChooserActivityImpl();
 
-        private static void start(final int type) {
+        private static void start(final int type, final String acceptType, final Intent chooserIntent) {
             UtilsTransActivity.start(new Consumer<Intent>() {
                 @Override
                 public void accept(Intent data) {
                     data.putExtra(KEY_ACTION, type);
+                    data.putExtra(KEY_FILE_CHOOSER_INTENT, chooserIntent);
+                    data.putExtra(KEY_FILE_CHOOSER_TYPE, acceptType);
                 }
             }, INSTANCE);
         }
@@ -101,7 +155,7 @@ public final class FileChooserUtils {
             } else if (type == ACTION_VIDEO) {
                 realOpenVideo(activity);
             } else {
-                fetchFile(activity);
+                realOpenFileChooser(activity);
             }
         }
 
@@ -133,6 +187,7 @@ public final class FileChooserUtils {
                 if (mFile == null) {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                     cancel(activity);
+                    return;
                 }
                 Intent intent = AgentWebUtils.getIntentCaptureCompat(activity, mFile);
                 // 指定开启系统相机的Action
@@ -157,13 +212,8 @@ public final class FileChooserUtils {
                     cancel(activity);
                     return;
                 }
-                File mFile = AgentWebUtils.createImageFile(activity);
-                if (mFile == null) {
-                    sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
-                    cancel(activity);
-                }
-                Intent intent = AgentWebUtils.getIntentAlbumCompat(activity, mFile);
-                sInstance.mUri = intent.getParcelableExtra(EXTRA_OUTPUT);
+                String acceptType = activity.getIntent().getStringExtra(KEY_FILE_CHOOSER_TYPE);
+                Intent intent = AgentWebUtils.getIntentAlbumCompat(activity, acceptType);
                 activity.startActivityForResult(intent, REQUEST_CODE);
             } catch (Exception e) {
                 LogUtils.e(TAG, "无法打开系统相册");
@@ -188,6 +238,7 @@ public final class FileChooserUtils {
                 if (mFile == null) {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                     cancel(activity);
+                    return;
                 }
                 Intent intent = AgentWebUtils.getIntentVideoCompat(activity, mFile);
                 sInstance.mUri = intent.getParcelableExtra(EXTRA_OUTPUT);
@@ -205,12 +256,13 @@ public final class FileChooserUtils {
          * 访问系统文件管理器
          * @param activity
          */
-        private void fetchFile(@NonNull UtilsTransActivity activity) {
+        private void realOpenFileChooser(@NonNull UtilsTransActivity activity) {
             try {
                 if (sInstance.mChooserListener == null) {
                     cancel(activity);
                     return;
                 }
+                // 在FileChooser中传参
                 Intent mIntent = activity.getIntent().getParcelableExtra(KEY_FILE_CHOOSER_INTENT);
                 if (mIntent == null) {
                     cancel(activity);
