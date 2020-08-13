@@ -405,9 +405,9 @@ public class FileChooser {
     /**
      * UIController Callback
      * value state
-     * 1 -> Cemera
-     * 2 -> Album
-     * 3 -> Files
+     * 0 -> Cemera
+     * 1 -> Album
+     * 2 -> Files
      * -1 Or Other -> Cancel
      * @return
      */
@@ -416,7 +416,7 @@ public class FileChooser {
             @Override
             public void handleValue(Integer value) {
                 switch (value) {
-                    case 1:
+                    case 0:
                         mCameraState = true;
                         if (mAcceptType.contains("video/")) {
                             openCameraAction(true);
@@ -424,7 +424,7 @@ public class FileChooser {
                             openCameraAction(false);
                         }
                         break;
-                    case 2:
+                    case 1:
                         mCameraState = false;
                         if (mAcceptType.contains("video/")) {
                             openAlbumAction(true);
@@ -432,7 +432,8 @@ public class FileChooser {
                             openAlbumAction(false);
                         }
                         break;
-                    case 3:
+                    case 2:
+                        mCameraState = false;
                         openFilesAction();
                         break;
                     default:
