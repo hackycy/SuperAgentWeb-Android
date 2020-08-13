@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.DownloadListener;
 import android.webkit.WebView;
 
 import androidx.annotation.IdRes;
@@ -27,6 +28,7 @@ import com.siyee.superagentweb.abs.WebListenerManager;
 import com.siyee.superagentweb.impl.AgentWebUIControllerImplBase;
 import com.siyee.superagentweb.impl.DefaultAgentWebSettings;
 import com.siyee.superagentweb.impl.DefaultChromeClient;
+import com.siyee.superagentweb.impl.DefaultDownloadImpl;
 import com.siyee.superagentweb.impl.DefaultWebClient;
 import com.siyee.superagentweb.impl.DefaultWebCreator;
 import com.siyee.superagentweb.impl.DefaultWebLifeCycleImpl;
@@ -157,10 +159,16 @@ public class SuperAgentWeb {
      * MiddlewareWebClientBase WebViewClient 中间件
      */
     private MiddlewareWebClientBase mMiddleWrareWebClientBaseHeader;
+
     /**
      * MiddlewareWebChromeBase WebChromeClient 中间件
      */
     private MiddlewareWebChromeBase mMiddlewareWebChromeBaseHeader;
+
+    /**
+     * DownloadListener
+     */
+    private DownloadListener mDownloadListener = null;
 
     /**
      * constructor
@@ -194,6 +202,9 @@ public class SuperAgentWeb {
         }
         this.mMiddlewareWebChromeBaseHeader = builder.mMiddlewareWebChromeBaseHeader;
         this.mMiddleWrareWebClientBaseHeader = builder.mMiddlewareWebClientBaseHeader;
+        if (this.mDownloadListener == null) {
+            this.mDownloadListener = new DefaultDownloadImpl();
+        }
         init();
     }
 
@@ -224,7 +235,7 @@ public class SuperAgentWeb {
         }
         agentWebSettings.toSetting(mWebCreator.getWebView());
         if (mWebListenerManager != null) {
-            mWebListenerManager.setDownloader(mWebCreator.getWebView(), null);
+            mWebListenerManager.setDownloader(mWebCreator.getWebView(), this.mDownloadListener);
             mWebListenerManager.setWebChromeClient(mWebCreator.getWebView(), getWebChromeClient());
             mWebListenerManager.setWebViewClient(mWebCreator.getWebView(), getWebViewClient());
         }
@@ -433,6 +444,7 @@ public class SuperAgentWeb {
         private PermissionInterceptor mPermissionInterceptor;
         private AbsAgentWebUIController mAgentWebUIController;
         private IEventHandler mEventHandler;
+        private DownloadListener mDownloadListener;
 
         /** Client And Middleware **/
         private com.siyee.superagentweb.WebChromeClient mWebChromeClient;
@@ -590,6 +602,11 @@ public class SuperAgentWeb {
                 this.mMiddlewareWebChromeBaseTail.enq(middlewareWebChromeBase);
                 this.mMiddlewareWebChromeBaseTail = middlewareWebChromeBase;
             }
+            return this;
+        }
+
+        public Builder setDownloadListener(@Nullable DownloadListener downloadListener) {
+            this.mDownloadListener = downloadListener;
             return this;
         }
 
