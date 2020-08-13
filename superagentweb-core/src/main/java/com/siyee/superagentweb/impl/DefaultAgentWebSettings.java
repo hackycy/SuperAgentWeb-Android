@@ -1,11 +1,7 @@
 package com.siyee.superagentweb.impl;
 
-import android.webkit.DownloadListener;
-import android.webkit.WebView;
-
 import com.siyee.superagentweb.SuperAgentWeb;
 import com.siyee.superagentweb.abs.AbsAgentWebSettings;
-import com.siyee.superagentweb.abs.WebListenerManager;
 
 /**
  * @author hackycy
@@ -14,15 +10,7 @@ public class DefaultAgentWebSettings extends AbsAgentWebSettings {
 
     @Override
     protected void bindAgentWebSupport(SuperAgentWeb superAgentWeb) {
-        this.mSuperAgentWeb = superAgentWeb;
-    }
-
-    @Override
-    public WebListenerManager setDownloader(WebView webView, DownloadListener downloadListener) {
-        if (downloadListener == null) {
-//            downloadListener = DefaultDownloadImpl.create(mAgentWeb.getActivity(), webView, mAgentWeb.getPermissionInterceptor());
-        }
-        return super.setDownloader(webView, downloadListener);
+        // Nothing To Do
     }
 
 }

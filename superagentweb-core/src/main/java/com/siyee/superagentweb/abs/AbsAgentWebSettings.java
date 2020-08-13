@@ -21,7 +21,7 @@ import com.siyee.superagentweb.utils.ProcessUtils;
  */
 public abstract class AbsAgentWebSettings implements IAgentWebSettings, WebListenerManager {
 
-    private WebSettings mWebSettings;
+    protected WebSettings mWebSettings;
     protected SuperAgentWeb mSuperAgentWeb;
     private static final String TAG = AbsAgentWebSettings.class.getSimpleName();
     public static final String USERAGENT_UC = " UCBrowser/11.6.4.950 ";
