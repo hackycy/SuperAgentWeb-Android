@@ -1,10 +1,12 @@
 package com.siyee.superagentweb.filechooser;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -127,6 +129,7 @@ public class FileChooser {
     /**
      * 启动FileChooser
      */
+    @SuppressLint("NewApi")
     public void startChooser() {
         if (!AgentWebUtils.isUIThread()) {
             AgentWebUtils.runOnUIThread(new Runnable() {
@@ -136,6 +139,21 @@ public class FileChooser {
                 }
             });
             return;
+        }
+        if (this.mIsAboveLollipop && this.mFileChooserParams != null && this.mFileChooserParams.getAcceptTypes() != null) {
+            String[] types = this.mFileChooserParams.getAcceptTypes();
+            for (String typeTmp : types) {
+                if (TextUtils.isEmpty(typeTmp)) {
+                    continue;
+                }
+//                if (typeTmp.contains("*/") || typeTmp.contains("image/")) {  //这是拍照模式
+//                    break;
+//                }
+                if (typeTmp.contains("video/")) {  //调用摄像机拍摄
+                    mVideoState = true;
+                    break;
+                }
+            }
         }
         if (null != this.mAgentWebUIController.get()) {
             // 1、相机 2、图库 3、文件
@@ -418,19 +436,11 @@ public class FileChooser {
                 switch (value) {
                     case 0:
                         mCameraState = true;
-                        if (mAcceptType.contains("video/")) {
-                            openCameraAction(true);
-                        } else {
-                            openCameraAction(false);
-                        }
+                        openCameraAction(mVideoState);
                         break;
                     case 1:
                         mCameraState = false;
-                        if (mAcceptType.contains("video/")) {
-                            openAlbumAction(true);
-                        } else {
-                            openAlbumAction(false);
-                        }
+                        openAlbumAction(mVideoState);
                         break;
                     case 2:
                         mCameraState = false;
@@ -457,7 +467,6 @@ public class FileChooser {
             cancel();
             return;
         }
-        this.mVideoState = videoState;
         if (PermissionUtils.isGranted(AgentWebPermissions.CAMERA)) {
             int actionCode = videoState ? FileChooserUtils.ACTION_VIDEO : FileChooserUtils.ACTION_CAMERA;
             FileChooserUtils.chooser(actionCode).callback(mChooserListener).open();
@@ -482,7 +491,6 @@ public class FileChooser {
             cancel();
             return;
         }
-        this.mVideoState = videoState;
         if (PermissionUtils.isGranted(AgentWebPermissions.STORAGE)) {
             String acceptType = videoState ? "video/*" : "image/*";
             FileChooserUtils.chooser(FileChooserUtils.ACTION_ALBUM, acceptType).callback(mChooserListener).open();

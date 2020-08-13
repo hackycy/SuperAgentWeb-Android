@@ -12,6 +12,7 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.siyee.superagentweb.AgentWebConfig;
 import com.siyee.superagentweb.abs.Consumer;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.filechooser.FileChooser;
@@ -110,7 +111,7 @@ public final class FileChooserUtils {
                                                 @Nullable ValueCallback<Uri[]> valueCallbacks,
                                                 @Nullable WebChromeClient.FileChooserParams fileChooserParams,
                                                 @Nullable PermissionInterceptor permissionInterceptor,
-                                                @Nullable ValueCallback valueCallback,
+                                                @Nullable ValueCallback<Uri> valueCallback,
                                                 @Nullable String mimeType) {
         FileChooser.Builder builder = FileChooser.newBuilder(activity, webView);
         if (valueCallbacks != null) {
@@ -144,13 +145,17 @@ public final class FileChooserUtils {
 
         private static FileChooserActivityImpl INSTANCE = new FileChooserActivityImpl();
 
-        private static void start(final int type, final String acceptType, final Intent chooserIntent) {
+        private static void start(@NonNull final int type, @Nullable final String acceptType, @Nullable final Intent chooserIntent) {
             UtilsTransActivity.start(new Consumer<Intent>() {
                 @Override
                 public void accept(Intent data) {
                     data.putExtra(KEY_ACTION, type);
-                    data.putExtra(KEY_FILE_CHOOSER_INTENT, chooserIntent);
-                    data.putExtra(KEY_FILE_CHOOSER_TYPE, acceptType);
+                    if (chooserIntent != null) {
+                        data.putExtra(KEY_FILE_CHOOSER_INTENT, chooserIntent);
+                    }
+                    if (!TextUtils.isEmpty(acceptType)) {
+                        data.putExtra(KEY_FILE_CHOOSER_TYPE, acceptType);
+                    }
                 }
             }, INSTANCE);
         }
@@ -214,6 +219,9 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
+                if (AgentWebConfig.DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -236,6 +244,9 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
+                if (AgentWebConfig.DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -264,6 +275,9 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
+                if (AgentWebConfig.DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -290,6 +304,9 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
+                if (AgentWebConfig.DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
 

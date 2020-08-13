@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <external-cache-path
-        name="superagenweb_files"
-        path="superagenweb-cache"/>
+        name="superagentweb_files"
+        path="superagentweb-cache"/>
 </paths>
