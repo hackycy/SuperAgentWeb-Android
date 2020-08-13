@@ -253,10 +253,10 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
         );
     }
 
-    private void createAndOpenCommonFileChooser(ValueCallback valueCallback, String mimeType) {
+    private void createAndOpenCommonFileChooser(ValueCallback<Uri> valueCallback, String mimeType) {
         Activity mActivity = this.mActivityWeakReference.get();
         if (mActivity == null || mActivity.isFinishing()) {
-            valueCallback.onReceiveValue(new Object());
+            valueCallback.onReceiveValue(Uri.EMPTY);
             return;
         }
         FileChooserUtils.showFileChooserCompat(mActivity,
