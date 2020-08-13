@@ -15,13 +15,14 @@ class MainActivity : AppCompatActivity() {
     val agentweb: SuperAgentWeb by lazy {
         SuperAgentWeb.with(this)
             .setAgentWebParent(fl, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+            .interceptUnkownUrl()
             .build()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        agentweb.webCreator.webView.loadUrl("https://m.baidu.com")
+        agentweb.webCreator.webView.loadUrl("https://kefu.xianqi.mobi/chat?phone=15622472425")
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
