@@ -12,7 +12,7 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.siyee.superagentweb.AgentWebConfig;
+import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.abs.Consumer;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.filechooser.FileChooser;
@@ -219,7 +219,7 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
-                if (AgentWebConfig.DEBUG) {
+                if (SuperAgentWebConfig.DEBUG) {
                     e.printStackTrace();
                 }
             }
@@ -244,7 +244,7 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
-                if (AgentWebConfig.DEBUG) {
+                if (SuperAgentWebConfig.DEBUG) {
                     e.printStackTrace();
                 }
             }
@@ -275,7 +275,7 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
-                if (AgentWebConfig.DEBUG) {
+                if (SuperAgentWebConfig.DEBUG) {
                     e.printStackTrace();
                 }
             }
@@ -304,7 +304,7 @@ public final class FileChooserUtils {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                 }
                 cancel(activity);
-                if (AgentWebConfig.DEBUG) {
+                if (SuperAgentWebConfig.DEBUG) {
                     e.printStackTrace();
                 }
             }

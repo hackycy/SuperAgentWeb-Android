@@ -9,10 +9,11 @@ import com.siyee.superagentweb.utils.LogUtils;
 
 import java.io.File;
 
-public class AgentWebConfig {
+public class SuperAgentWebConfig {
 
     public static final String FILE_CACHE_PATH = "superagentweb-cache";
     public static final String AGENTWEB_CACHE_PATCH = File.separator + FILE_CACHE_PATH;
+    public static final String PROVIDER_SUFFIX = ".SuperAgentWebFileProvider";
 
     /**
      * Log Debug switch
@@ -31,7 +32,7 @@ public class AgentWebConfig {
 
     private static volatile boolean IS_INITIALIZED = false;
 
-    private static final String TAG = AgentWebConfig.class.getSimpleName();
+    private static final String TAG = SuperAgentWebConfig.class.getSimpleName();
 
     public static final String AGENTWEB_NAME = "SuperAgentWeb";
 

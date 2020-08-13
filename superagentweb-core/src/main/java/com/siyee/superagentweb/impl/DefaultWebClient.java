@@ -21,7 +21,7 @@ import androidx.annotation.RequiresApi;
 import com.alipay.sdk.app.H5PayCallback;
 import com.alipay.sdk.app.PayTask;
 import com.alipay.sdk.util.H5PayResultModel;
-import com.siyee.superagentweb.AgentWebConfig;
+import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.OpenOtherPageWays;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
@@ -366,7 +366,7 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
                 intent.setData(Uri.parse(url));
                 mActivity.startActivity(intent);
             } catch (ActivityNotFoundException e) {
-                if (AgentWebConfig.DEBUG) {
+                if (SuperAgentWebConfig.DEBUG) {
                     e.printStackTrace();
                 }
             }

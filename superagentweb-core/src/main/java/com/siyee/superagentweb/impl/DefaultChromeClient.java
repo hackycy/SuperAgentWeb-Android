@@ -17,8 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.siyee.superagentweb.AgentWebConfig;
-import com.siyee.superagentweb.AgentWebPermissions;
+import com.siyee.superagentweb.SuperAgentWebConfig;
+import com.siyee.superagentweb.SuperAgentWebPermissions;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.IVideo;
 import com.siyee.superagentweb.abs.IndicatorController;
@@ -128,7 +128,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
                 this.mAgentWebUIController.get().onJsConfirm(view, url, message, result);
             }
         } catch (Exception e) {
-            if (AgentWebConfig.DEBUG) {
+            if (SuperAgentWebConfig.DEBUG) {
                 e.printStackTrace();
             }
         }
@@ -143,7 +143,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
             }
             result.confirm();
         } catch (Exception e) {
-            if (AgentWebConfig.DEBUG) {
+            if (SuperAgentWebConfig.DEBUG) {
                 e.printStackTrace();
             }
         }
@@ -157,7 +157,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
                 this.mAgentWebUIController.get().onJsPrompt(view, url, message, defaultValue, result);
             }
         } catch (Exception e) {
-            if (AgentWebConfig.DEBUG) {
+            if (SuperAgentWebConfig.DEBUG) {
                 e.printStackTrace();
             }
         }
@@ -167,7 +167,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
     @Override
     public void onGeolocationPermissionsShowPrompt(String origin, GeolocationPermissions.Callback callback) {
         if (mPermissionInterceptor != null) {
-            if (mPermissionInterceptor.intercept(this.mWebView.getUrl(), AgentWebPermissions.LOCATION, AgentWebPermissions.ACTION_LOCATION)) {
+            if (mPermissionInterceptor.intercept(this.mWebView.getUrl(), SuperAgentWebPermissions.LOCATION, SuperAgentWebPermissions.ACTION_LOCATION)) {
                 callback.invoke(origin, false, false);
                 return;
             }
@@ -177,12 +177,12 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
             callback.invoke(origin, false, false);
             return;
         }
-        if (PermissionUtils.isGranted(AgentWebPermissions.LOCATION)) {
+        if (PermissionUtils.isGranted(SuperAgentWebPermissions.LOCATION)) {
             callback.invoke(origin, true, false);
         } else {
             this.mOrigin = origin;
             this.mCallback = callback;
-            PermissionUtils.permission(AgentWebPermissions.LOCATION)
+            PermissionUtils.permission(SuperAgentWebPermissions.LOCATION)
                     .callback(mLocationPermissionFullCallback)
                     .request();
         }
@@ -213,8 +213,8 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
                 mAgentWebUIController
                         .get()
                         .onPermissionsDeny(
-                                AgentWebPermissions.LOCATION,
-                                AgentWebPermissions.ACTION_LOCATION);
+                                SuperAgentWebPermissions.LOCATION,
+                                SuperAgentWebPermissions.ACTION_LOCATION);
             }
         }
     };

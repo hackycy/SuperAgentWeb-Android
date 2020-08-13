@@ -2,14 +2,14 @@ package com.siyee.superagentweb.utils;
 
 import android.util.Log;
 
-import com.siyee.superagentweb.AgentWebConfig;
+import com.siyee.superagentweb.SuperAgentWebConfig;
 
 public class LogUtils {
 
     private static final String PREFIX = "superagentweb-";
 
     public static boolean isDebug() {
-        return AgentWebConfig.DEBUG;
+        return SuperAgentWebConfig.DEBUG;
     }
 
     public static void i(String tag, String message) {

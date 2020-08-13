@@ -5,7 +5,7 @@ import android.Manifest;
 /**
  * @author hackycy
  */
-public class AgentWebPermissions {
+public class SuperAgentWebPermissions {
 
     public static final String[] CAMERA;
     public static final String[] LOCATION;

@@ -6,7 +6,6 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
@@ -18,7 +17,7 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.siyee.superagentweb.AgentWebPermissions;
+import com.siyee.superagentweb.SuperAgentWebPermissions;
 import com.siyee.superagentweb.R;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
@@ -396,7 +395,7 @@ public class FileChooser {
             } else {
                 cancel();
                 if (null != this.mAgentWebUIController.get()) {
-                    this.mAgentWebUIController.get().onPermissionsDeny(AgentWebPermissions.CAMERA, AgentWebPermissions.ACTION_CAMERA);
+                    this.mAgentWebUIController.get().onPermissionsDeny(SuperAgentWebPermissions.CAMERA, SuperAgentWebPermissions.ACTION_CAMERA);
                 }
             }
         } else if (this.mCurrentFromIntentCode == FROM_INTENT_CODE_ALBUM) {
@@ -405,7 +404,7 @@ public class FileChooser {
             } else {
                 cancel();
                 if (null != this.mAgentWebUIController.get()) {
-                    this.mAgentWebUIController.get().onPermissionsDeny(AgentWebPermissions.STORAGE, AgentWebPermissions.ACTION_STORAGE);
+                    this.mAgentWebUIController.get().onPermissionsDeny(SuperAgentWebPermissions.STORAGE, SuperAgentWebPermissions.ACTION_STORAGE);
                 }
             }
         } else if (this.mCurrentFromIntentCode == FROM_INTENT_CODE_FILES) {
@@ -414,7 +413,7 @@ public class FileChooser {
             } else {
                 cancel();
                 if (null != this.mAgentWebUIController.get()) {
-                    this.mAgentWebUIController.get().onPermissionsDeny(AgentWebPermissions.STORAGE, AgentWebPermissions.ACTION_STORAGE);
+                    this.mAgentWebUIController.get().onPermissionsDeny(SuperAgentWebPermissions.STORAGE, SuperAgentWebPermissions.ACTION_STORAGE);
                 }
             }
         }
@@ -463,16 +462,16 @@ public class FileChooser {
             return;
         }
         if (this.mPermissionInterceptor != null &&
-                this.mPermissionInterceptor.intercept(this.mWebView.getUrl(), AgentWebPermissions.CAMERA, AgentWebPermissions.ACTION_CAMERA)) {
+                this.mPermissionInterceptor.intercept(this.mWebView.getUrl(), SuperAgentWebPermissions.CAMERA, SuperAgentWebPermissions.ACTION_CAMERA)) {
             cancel();
             return;
         }
-        if (PermissionUtils.isGranted(AgentWebPermissions.CAMERA)) {
+        if (PermissionUtils.isGranted(SuperAgentWebPermissions.CAMERA)) {
             int actionCode = videoState ? FileChooserUtils.ACTION_VIDEO : FileChooserUtils.ACTION_CAMERA;
             FileChooserUtils.chooser(actionCode).callback(mChooserListener).open();
         } else {
             this.mCurrentFromIntentCode = FROM_INTENT_CODE_CAMERA;
-            PermissionUtils.permission(AgentWebPermissions.CAMERA)
+            PermissionUtils.permission(SuperAgentWebPermissions.CAMERA)
                     .callback(mPermissionListener)
                     .request();
         }
@@ -487,16 +486,16 @@ public class FileChooser {
             return;
         }
         if (this.mPermissionInterceptor != null &&
-                this.mPermissionInterceptor.intercept(this.mWebView.getUrl(), AgentWebPermissions.STORAGE, AgentWebPermissions.ACTION_STORAGE)) {
+                this.mPermissionInterceptor.intercept(this.mWebView.getUrl(), SuperAgentWebPermissions.STORAGE, SuperAgentWebPermissions.ACTION_STORAGE)) {
             cancel();
             return;
         }
-        if (PermissionUtils.isGranted(AgentWebPermissions.STORAGE)) {
+        if (PermissionUtils.isGranted(SuperAgentWebPermissions.STORAGE)) {
             String acceptType = videoState ? "video/*" : "image/*";
             FileChooserUtils.chooser(FileChooserUtils.ACTION_ALBUM, acceptType).callback(mChooserListener).open();
         } else {
             this.mCurrentFromIntentCode = FROM_INTENT_CODE_ALBUM;
-            PermissionUtils.permission(AgentWebPermissions.STORAGE).callback(mPermissionListener).request();
+            PermissionUtils.permission(SuperAgentWebPermissions.STORAGE).callback(mPermissionListener).request();
         }
     }
 
@@ -509,18 +508,18 @@ public class FileChooser {
             return;
         }
         if (this.mPermissionInterceptor != null &&
-                this.mPermissionInterceptor.intercept(this.mWebView.getUrl(), AgentWebPermissions.STORAGE, AgentWebPermissions.ACTION_STORAGE)) {
+                this.mPermissionInterceptor.intercept(this.mWebView.getUrl(), SuperAgentWebPermissions.STORAGE, SuperAgentWebPermissions.ACTION_STORAGE)) {
             cancel();
             return;
         }
-        if (PermissionUtils.isGranted(AgentWebPermissions.STORAGE)) {
+        if (PermissionUtils.isGranted(SuperAgentWebPermissions.STORAGE)) {
             FileChooserUtils.chooser(FileChooserUtils.ACTION_FILE,
                     AgentWebUtils.getCommonFileIntentCompat(this.mIsAboveLollipop, this.mFileChooserParams, this.mAcceptType))
                     .callback(mChooserListener)
                     .open();
         } else {
             this.mCurrentFromIntentCode = FROM_INTENT_CODE_FILES;
-            PermissionUtils.permission(AgentWebPermissions.STORAGE).callback(mPermissionListener).request();
+            PermissionUtils.permission(SuperAgentWebPermissions.STORAGE).callback(mPermissionListener).request();
         }
     }
 

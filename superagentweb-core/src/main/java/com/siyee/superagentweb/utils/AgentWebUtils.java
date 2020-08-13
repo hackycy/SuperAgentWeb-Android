@@ -34,8 +34,8 @@ import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.core.os.EnvironmentCompat;
 
-import com.siyee.superagentweb.AgentWebConfig;
 import com.siyee.superagentweb.R;
+import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
@@ -48,7 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import static com.siyee.superagentweb.AgentWebConfig.AGENTWEB_CACHE_PATCH;
+import static com.siyee.superagentweb.SuperAgentWebConfig.AGENTWEB_CACHE_PATCH;
 
 /**
  * @author hackycy
@@ -220,7 +220,7 @@ public class AgentWebUtils {
 
     public static Uri getUriFromFileForN(Context context, File file) {
         // AndroidManifest.xml -> authorities
-        return FileProvider.getUriForFile(context, context.getPackageName() + ".AgentWebFileProvider", file);
+        return FileProvider.getUriForFile(context, context.getPackageName() + SuperAgentWebConfig.PROVIDER_SUFFIX, file);
     }
 
     public static String[] uriToPath(Activity activity, Uri[] uris) {
@@ -283,7 +283,7 @@ public class AgentWebUtils {
             } else {
             }
         } // MediaStore (and general)
-        else if (fileUri.getAuthority().equalsIgnoreCase(context.getPackageName() + ".AgentWebFileProvider")) {
+        else if (fileUri.getAuthority().equalsIgnoreCase(context.getPackageName() + SuperAgentWebConfig.PROVIDER_SUFFIX)) {
             String path = fileUri.getPath();
             int index = path.lastIndexOf("/");
             return getAgentWebFilePath(context) + File.separator + path.substring(index + 1, path.length());
@@ -627,11 +627,11 @@ public class AgentWebUtils {
     }
 
     public static String getAgentWebFilePath(Context context) {
-        if (!TextUtils.isEmpty(AgentWebConfig.AGENTWEB_FILE_PATH)) {
-            return AgentWebConfig.AGENTWEB_FILE_PATH;
+        if (!TextUtils.isEmpty(SuperAgentWebConfig.AGENTWEB_FILE_PATH)) {
+            return SuperAgentWebConfig.AGENTWEB_FILE_PATH;
         }
         String dir = getDiskExternalCacheDir(context);
-        File mFile = new File(dir, AgentWebConfig.FILE_CACHE_PATH);
+        File mFile = new File(dir, SuperAgentWebConfig.FILE_CACHE_PATH);
         try {
             if (!mFile.exists()) {
                 mFile.mkdirs();
@@ -640,7 +640,7 @@ public class AgentWebUtils {
             LogUtils.i(TAG, "create dir exception");
         }
         LogUtils.i(TAG, "path:" + mFile.getAbsolutePath() + "  path:" + mFile.getPath());
-        return AgentWebConfig.AGENTWEB_FILE_PATH = mFile.getAbsolutePath();
+        return SuperAgentWebConfig.AGENTWEB_FILE_PATH = mFile.getAbsolutePath();
     }
 
     public static String getDiskExternalCacheDir(Context context) {

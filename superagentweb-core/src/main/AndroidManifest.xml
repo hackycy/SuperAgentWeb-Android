@@ -5,8 +5,8 @@
 
         <!--   FIleProvider    -->
         <provider
-            android:name="com.siyee.superagentweb.AgentWebFileProvider"
-            android:authorities="${applicationId}.AgentWebFileProvider"
+            android:name="com.siyee.superagentweb.SuperAgentWebFileProvider"
+            android:authorities="${applicationId}.SuperAgentWebFileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

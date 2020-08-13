@@ -10,7 +10,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.siyee.superagentweb.AgentWebConfig;
+import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.SuperAgentWeb;
 import com.siyee.superagentweb.utils.AgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
@@ -26,7 +26,7 @@ public abstract class AbsAgentWebSettings implements IAgentWebSettings, WebListe
     private static final String TAG = AbsAgentWebSettings.class.getSimpleName();
     public static final String USERAGENT_UC = " UCBrowser/11.6.4.950 ";
     public static final String USERAGENT_QQ_BROWSER = " MQQBrowser/8.0 ";
-    public static final String USERAGENT_AGENTWEB = " " + AgentWebConfig.AGENTWEB_VERSION + " ";
+    public static final String USERAGENT_AGENTWEB = " " + SuperAgentWebConfig.AGENTWEB_VERSION + " ";
 
     @Override
     public IAgentWebSettings toSetting(WebView webView) {
