@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        agentweb.webCreator.webView.loadUrl("https://kefu.xianqi.mobi/chat?phone=15622472425")
+        agentweb.webCreator.webView.loadUrl("https://m.baidu.com")
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
