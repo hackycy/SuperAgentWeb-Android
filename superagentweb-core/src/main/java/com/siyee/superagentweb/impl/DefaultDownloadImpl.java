@@ -2,10 +2,7 @@ package com.siyee.superagentweb.impl;
 
 import android.app.Activity;
 import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.webkit.DownloadListener;
 import android.webkit.WebView;
@@ -127,12 +124,15 @@ public class DefaultDownloadImpl implements DownloadListener {
              */
             request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             request.addRequestHeader("User-Agent", userAgent);
+            if (null != this.mAbsAgentWebUIController.get()) {
+                this.mAbsAgentWebUIController.get()
+                        .onShowMessage(AgentWebUtils.getApp().getResources().getString(R.string.agentweb_coming_soon_download), "performDownload");
+            }
             manager.enqueue(request);
-            this.mAbsAgentWebUIController.get()
-                    .onShowMessage(mActivity.get().getResources().getString(R.string.agentweb_coming_soon_download), "performDownload");
         } catch (Exception e) {
             if (null != this.mAbsAgentWebUIController.get()) {
-                this.mAbsAgentWebUIController.get().onShowMessage(mActivity.get().getResources().getString(R.string.agentweb_download_fail), "performDownload");
+                this.mAbsAgentWebUIController.get()
+                        .onShowMessage(AgentWebUtils.getApp().getResources().getString(R.string.agentweb_download_fail), "performDownload");
             }
             if (SuperAgentWebConfig.DEBUG) {
                 e.printStackTrace();
@@ -180,13 +180,13 @@ public class DefaultDownloadImpl implements DownloadListener {
         return (DownloadManager) this.mActivity.get().getSystemService(Context.DOWNLOAD_SERVICE);
     }
 
-    public static class DownloadManagerReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-        }
-
-    }
+//    public static class DownloadManagerReceiver extends BroadcastReceiver {
+//
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//
+//        }
+//
+//    }
 
 }

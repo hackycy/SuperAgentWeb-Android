@@ -1,7 +1,7 @@
 <resources>
     <string name="agentweb_download_task_has_been_exist">The task already exists, do not repeat click to download!</string>
     <string name="agentweb_tips">Note</string>
-    <string name="agentweb_honeycomblow">Wi-Fi disconnected. Continue the download via mobile data network?</string>
+    <string name="agentweb_performdownload">Are you sure you want to download this file?</string>
     <string name="agentweb_download">Download</string>
     <string name="agentweb_cancel">Cancel</string>
     <string name="agentweb_download_fail">Download failed!</string>

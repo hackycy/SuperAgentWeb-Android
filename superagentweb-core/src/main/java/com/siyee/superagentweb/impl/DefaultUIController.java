@@ -5,8 +5,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
@@ -195,7 +193,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 		}
 		mAlertDialog = new AlertDialog.Builder(mActivity)
 				.setTitle(mResources.getString(R.string.agentweb_tips))
-				.setMessage(mResources.getString(R.string.agentweb_honeycomblow))
+				.setMessage(mResources.getString(R.string.agentweb_performdownload))
 				.setNegativeButton(mResources.getString(R.string.agentweb_download), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -316,9 +314,9 @@ public class DefaultUIController extends AbsAgentWebUIController {
 
 	@Override
 	public void onShowMessage(String message, String from) {
-		if (!TextUtils.isEmpty(from) && from.contains("performDownload")) {
-			return;
-		}
+//		if (!TextUtils.isEmpty(from) && from.contains("performDownload")) {
+//			return;
+//		}
 		AgentWebUtils.toastShowShort(mActivity.getApplicationContext(), message);
 	}
 
