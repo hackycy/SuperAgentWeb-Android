@@ -94,7 +94,7 @@ public abstract class AbsAgentWebUIController {
      * @param url      当前下载地址。
      * @param callback 用户操作回调回调
      */
-    public abstract void onForceDownloadAlert(String url, Handler.Callback callback);
+    public abstract void onForceDownloadAlert(String url, Callback<Integer> callback);
 
     /**
      * WebChromeClient#onJsPrompt

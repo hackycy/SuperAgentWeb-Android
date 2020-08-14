@@ -14,12 +14,22 @@
                 android:resource="@xml/web_files_public"/>
         </provider>
 
+        <!-- UtilsTransActivity -->
         <activity
             android:name="com.siyee.superagentweb.utils.UtilsTransActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:multiprocess="true"
             android:theme="@style/SuperAgentWeb_ActivityTranslucent"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
+
+        <!--  DefaultDownloadImpl DownloadManagerReceiver  -->
+        <receiver android:name="com.siyee.superagentweb.impl.DefaultDownloadImpl$DownloadManagerReceiver">
+            <intent-filter>
+                <!-- 配置 点击通知 和 下载完成 两个 action -->
+                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED"/>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+            </intent-filter>
+        </receiver>
 
     </application>
 </manifest>

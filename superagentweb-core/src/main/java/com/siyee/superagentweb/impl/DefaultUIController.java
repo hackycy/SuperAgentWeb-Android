@@ -185,7 +185,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 	}
 
 	@Override
-	public void onForceDownloadAlert(String url, final Handler.Callback callback) {
+	public void onForceDownloadAlert(String url, final Callback<Integer> callback) {
 		Activity mActivity;
 		if ((mActivity = this.mActivity) == null || mActivity.isFinishing()) {
 			return;
@@ -203,14 +203,13 @@ public class DefaultUIController extends AbsAgentWebUIController {
 							dialog.dismiss();
 						}
 						if (callback != null) {
-							callback.handleMessage(Message.obtain());
+							callback.handleValue(1);
 						}
 					}
 				})//
 				.setPositiveButton(mResources.getString(R.string.agentweb_cancel), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-
 						if (dialog != null) {
 							dialog.dismiss();
 						}

@@ -14,6 +14,7 @@ public class SuperAgentWebPermissions {
     public static final String ACTION_CAMERA = "Camera";
     public static final String ACTION_LOCATION = "Location";
     public static final String ACTION_STORAGE = "Storage";
+    public static final String ACTION_DOWNLOAD = "Download";
 
     static {
         CAMERA = new String[]{

@@ -21,6 +21,7 @@ import android.os.Looper;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -451,6 +452,45 @@ public class AgentWebUtils {
             mFile.createNewFile();
         }
         return mFile;
+    }
+
+    public static int checkNetworkType(Context context) {
+        int netType = 0;
+        //连接管理对象
+        ConnectivityManager manager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        //获取NetworkInfo对象
+        @SuppressLint("MissingPermission")
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if (networkInfo == null) {
+            return netType;
+        }
+        switch (networkInfo.getType()) {
+            case ConnectivityManager.TYPE_WIFI:
+            case ConnectivityManager.TYPE_WIMAX:
+            case ConnectivityManager.TYPE_ETHERNET:
+                return 1;
+            case ConnectivityManager.TYPE_MOBILE:
+                switch (networkInfo.getSubtype()) {
+                    case TelephonyManager.NETWORK_TYPE_LTE:  // 4G
+                    case TelephonyManager.NETWORK_TYPE_HSPAP:
+                    case TelephonyManager.NETWORK_TYPE_EHRPD:
+                        return 2;
+                    case TelephonyManager.NETWORK_TYPE_UMTS: // 3G
+                    case TelephonyManager.NETWORK_TYPE_CDMA:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_0:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_A:
+                    case TelephonyManager.NETWORK_TYPE_EVDO_B:
+                        return 3;
+                    case TelephonyManager.NETWORK_TYPE_GPRS: // 2G
+                    case TelephonyManager.NETWORK_TYPE_EDGE:
+                        return 4;
+                    default:
+                        return netType;
+                }
+
+            default:
+                return netType;
+        }
     }
 
     public static AbsAgentWebUIController getAgentWebUIControllerByWebView(WebView webView) {

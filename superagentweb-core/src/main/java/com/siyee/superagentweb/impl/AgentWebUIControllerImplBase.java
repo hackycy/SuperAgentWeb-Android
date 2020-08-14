@@ -45,7 +45,7 @@ public class AgentWebUIControllerImplBase extends AbsAgentWebUIController {
     }
 
     @Override
-    public void onForceDownloadAlert(String url, Handler.Callback callback) {
+    public void onForceDownloadAlert(String url, Callback<Integer> callback) {
         getDelegate().onForceDownloadAlert(url, callback);
     }
 
