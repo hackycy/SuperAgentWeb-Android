@@ -166,11 +166,6 @@ public class SuperAgentWeb {
     private MiddlewareWebChromeBase mMiddlewareWebChromeBaseHeader;
 
     /**
-     * DownloadListener
-     */
-    private DownloadListener mDownloadListener = null;
-
-    /**
      * constructor
      * @param builder
      */
@@ -202,9 +197,6 @@ public class SuperAgentWeb {
         }
         this.mMiddlewareWebChromeBaseHeader = builder.mMiddlewareWebChromeBaseHeader;
         this.mMiddleWrareWebClientBaseHeader = builder.mMiddlewareWebClientBaseHeader;
-        if (this.mDownloadListener == null) {
-            this.mDownloadListener = new DefaultDownloadImpl();
-        }
         init();
     }
 
@@ -235,7 +227,7 @@ public class SuperAgentWeb {
         }
         agentWebSettings.toSetting(mWebCreator.getWebView());
         if (mWebListenerManager != null) {
-            mWebListenerManager.setDownloader(mWebCreator.getWebView(), this.mDownloadListener);
+            mWebListenerManager.setDownloader(mWebCreator.getWebView(), null);
             mWebListenerManager.setWebChromeClient(mWebCreator.getWebView(), getWebChromeClient());
             mWebListenerManager.setWebViewClient(mWebCreator.getWebView(), getWebViewClient());
         }
@@ -444,7 +436,6 @@ public class SuperAgentWeb {
         private PermissionInterceptor mPermissionInterceptor;
         private AbsAgentWebUIController mAgentWebUIController;
         private IEventHandler mEventHandler;
-        private DownloadListener mDownloadListener;
 
         /** Client And Middleware **/
         private com.siyee.superagentweb.WebChromeClient mWebChromeClient;
@@ -602,11 +593,6 @@ public class SuperAgentWeb {
                 this.mMiddlewareWebChromeBaseTail.enq(middlewareWebChromeBase);
                 this.mMiddlewareWebChromeBaseTail = middlewareWebChromeBase;
             }
-            return this;
-        }
-
-        public Builder setDownloadListener(@Nullable DownloadListener downloadListener) {
-            this.mDownloadListener = downloadListener;
             return this;
         }
 
