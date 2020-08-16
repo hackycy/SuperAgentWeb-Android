@@ -91,20 +91,17 @@ public class DefaultDownloadImpl implements DownloadListener {
     }
 
     /**
-     * 检测移动网络
+     * 检测是否允许下载
      * @param url
      */
     private void preDownload(String url, String userAgent) {
-        if (AgentWebUtils.checkNetworkType(AgentWebUtils.getApp()) > 1) {
-            if (null == mActivity.get() || mActivity.get().isFinishing()) {
-                return;
-            }
-            if (null != mAbsAgentWebUIController.get()) {
-                mAbsAgentWebUIController.get().onForceDownloadAlert(url, getAlertCallback(url, userAgent));
-            }
+        if (null == mActivity.get() || mActivity.get().isFinishing()) {
             return;
         }
-        performDownload(url, userAgent);
+        if (null != mAbsAgentWebUIController.get()) {
+            mAbsAgentWebUIController.get().onForceDownloadAlert(url, getAlertCallback(url, userAgent));
+        }
+        return;
     }
 
     /**
