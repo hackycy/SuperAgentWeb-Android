@@ -2,6 +2,7 @@ package com.siyee.superagentweb;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
@@ -372,15 +373,18 @@ public class SuperAgentWeb {
         return this.mPermissionInterceptor;
     }
 
-    public IWebLifeCycle getWebLifeCycle() {
-        return this.mWebLifeCycle;
-    }
-
     public boolean back() {
         if (this.mEventHandler == null) {
             mEventHandler = EventHandlerImpl.getInstantce(mWebCreator.getWebView(), getInterceptor());
         }
         return mEventHandler.back();
+    }
+
+    public boolean handleKeyEvent(int keyCode, KeyEvent keyEvent) {
+        if (this.mEventHandler == null) {
+            this.mEventHandler = EventHandlerImpl.getInstantce(mWebCreator.getWebView(), getInterceptor());
+        }
+        return this.mEventHandler.onKeyDown(keyCode, keyEvent);
     }
 
     public WebCreator getWebCreator() {
@@ -391,8 +395,40 @@ public class SuperAgentWeb {
         return this.mEventHandler == null ? (this.mEventHandler = EventHandlerImpl.getInstantce(mWebCreator.getWebView(), getInterceptor())) : this.mEventHandler;
     }
 
+    public IUrlLoader getUrlLoader() {
+        return this.mIUrlLoader;
+    }
+
+    public IndicatorController getIndicatorController() {
+        return this.mIndicatorController;
+    }
+
+    public IAgentWebSettings getAgentWebSettings() {
+        return this.mAgentWebSettings;
+    }
+
+    public IWebLifeCycle getWebLifeCycle() {
+        return this.mWebLifeCycle;
+    }
+
     public Activity getActivity() {
         return this.mActivity;
+    }
+
+    public void go(String url) {
+        this.mIUrlLoader.loadUrl(url);
+    }
+
+    public void onDestroy() {
+        this.mWebLifeCycle.onDestroy();
+    }
+
+    public void onResume() {
+        this.mWebLifeCycle.onResume();
+    }
+
+    public void onPause() {
+        this.mWebLifeCycle.onPause();
     }
 
     /**
