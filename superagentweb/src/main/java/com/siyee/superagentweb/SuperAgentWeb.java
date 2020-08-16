@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.DownloadListener;
 import android.webkit.WebView;
 
 import androidx.annotation.IdRes;
@@ -28,7 +27,6 @@ import com.siyee.superagentweb.abs.WebListenerManager;
 import com.siyee.superagentweb.impl.AgentWebUIControllerImplBase;
 import com.siyee.superagentweb.impl.DefaultAgentWebSettings;
 import com.siyee.superagentweb.impl.DefaultChromeClient;
-import com.siyee.superagentweb.impl.DefaultDownloadImpl;
 import com.siyee.superagentweb.impl.DefaultWebClient;
 import com.siyee.superagentweb.impl.DefaultWebCreator;
 import com.siyee.superagentweb.impl.DefaultWebLifeCycleImpl;

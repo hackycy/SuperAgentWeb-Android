@@ -10,8 +10,8 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.SuperAgentWeb;
+import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.utils.AgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.ProcessUtils;

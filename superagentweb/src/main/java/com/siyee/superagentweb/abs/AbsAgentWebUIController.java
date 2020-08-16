@@ -2,7 +2,6 @@ package com.siyee.superagentweb.abs;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.os.Handler;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebView;
