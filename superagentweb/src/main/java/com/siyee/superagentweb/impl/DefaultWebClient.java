@@ -26,8 +26,8 @@ import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
-import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;

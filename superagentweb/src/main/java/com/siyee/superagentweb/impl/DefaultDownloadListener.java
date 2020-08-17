@@ -15,9 +15,9 @@ import com.siyee.superagentweb.SuperAgentWebPermissions;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
-import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.List;

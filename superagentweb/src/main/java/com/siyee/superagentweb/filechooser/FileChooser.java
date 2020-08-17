@@ -22,9 +22,9 @@ import com.siyee.superagentweb.SuperAgentWebPermissions;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
-import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.FileChooserUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
