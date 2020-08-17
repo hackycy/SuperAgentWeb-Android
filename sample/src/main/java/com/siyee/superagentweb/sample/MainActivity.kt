@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (agentweb.iEventHandler.onKeyDown(keyCode, event)) {
+        if (agentweb.handleKeyEvent(keyCode, event)) {
             return true
         }
         return super.onKeyDown(keyCode, event)
