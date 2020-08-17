@@ -203,13 +203,13 @@ public final class FileChooserUtils {
                     cancel(activity);
                     return;
                 }
-                File mFile = AgentWebUtils.createImageFile(activity);
+                File mFile = SuperAgentWebUtils.createImageFile(activity);
                 if (mFile == null) {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                     cancel(activity);
                     return;
                 }
-                Intent intent = AgentWebUtils.getIntentCaptureCompat(activity, mFile);
+                Intent intent = SuperAgentWebUtils.getIntentCaptureCompat(activity, mFile);
                 // 指定开启系统相机的Action
                 sInstance.mUri = intent.getParcelableExtra(EXTRA_OUTPUT);
                 activity.startActivityForResult(intent, REQUEST_CODE);
@@ -236,7 +236,7 @@ public final class FileChooserUtils {
                     return;
                 }
                 String acceptType = activity.getIntent().getStringExtra(KEY_FILE_CHOOSER_TYPE);
-                Intent intent = AgentWebUtils.getIntentAlbumCompat(activity, acceptType);
+                Intent intent = SuperAgentWebUtils.getIntentAlbumCompat(activity, acceptType);
                 activity.startActivityForResult(intent, REQUEST_CODE);
             } catch (Exception e) {
                 LogUtils.e(TAG, "无法打开系统相册");
@@ -260,13 +260,13 @@ public final class FileChooserUtils {
                     cancel(activity);
                     return;
                 }
-                File mFile = AgentWebUtils.createVideoFile(activity);
+                File mFile = SuperAgentWebUtils.createVideoFile(activity);
                 if (mFile == null) {
                     sInstance.mChooserListener.onChoiceResult(REQUEST_CODE, Activity.RESULT_CANCELED, null);
                     cancel(activity);
                     return;
                 }
-                Intent intent = AgentWebUtils.getIntentVideoCompat(activity, mFile);
+                Intent intent = SuperAgentWebUtils.getIntentVideoCompat(activity, mFile);
                 sInstance.mUri = intent.getParcelableExtra(EXTRA_OUTPUT);
                 activity.startActivityForResult(intent, REQUEST_CODE);
             } catch (Exception e) {

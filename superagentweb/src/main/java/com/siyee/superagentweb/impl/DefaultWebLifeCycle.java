@@ -3,16 +3,16 @@ package com.siyee.superagentweb.impl;
 import android.webkit.WebView;
 
 import com.siyee.superagentweb.abs.IWebLifeCycle;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 
 /**
  * @author hackycy
  */
-public class DefaultWebLifeCycleImpl implements IWebLifeCycle {
+public class DefaultWebLifeCycle implements IWebLifeCycle {
 
     private WebView mWebView;
 
-    public DefaultWebLifeCycleImpl(WebView webView) {
+    public DefaultWebLifeCycle(WebView webView) {
         this.mWebView = webView;
     }
 
@@ -36,7 +36,7 @@ public class DefaultWebLifeCycleImpl implements IWebLifeCycle {
     public void onDestroy() {
         if (this.mWebView != null) {
             this.mWebView.pauseTimers();
-            AgentWebUtils.clearWebView(this.mWebView);
+            SuperAgentWebUtils.clearWebView(this.mWebView);
         }
     }
 

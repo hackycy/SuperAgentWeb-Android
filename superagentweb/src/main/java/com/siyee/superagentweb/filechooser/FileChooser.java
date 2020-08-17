@@ -22,7 +22,7 @@ import com.siyee.superagentweb.SuperAgentWebPermissions;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.FileChooserUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
 
@@ -122,7 +122,7 @@ public class FileChooser {
         this.mWebView = builder.mWebView;
         this.mPermissionInterceptor = builder.mPermissionInterceptor;
         this.mIsAboveLollipop = builder.mIsAboveLollipop;
-        this.mAgentWebUIController = new WeakReference<>(AgentWebUtils.getAgentWebUIControllerByWebView(builder.mWebView));
+        this.mAgentWebUIController = new WeakReference<>(SuperAgentWebUtils.getAgentWebUIControllerByWebView(builder.mWebView));
     }
 
     /**
@@ -130,8 +130,8 @@ public class FileChooser {
      */
     @SuppressLint("NewApi")
     public void startChooser() {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     startChooser();
@@ -263,7 +263,7 @@ public class FileChooser {
             mUriValueCallbacks.onReceiveValue(null);
             return;
         }
-        String[] paths = AgentWebUtils.uriToPath(mActivity, datas);
+        String[] paths = SuperAgentWebUtils.uriToPath(mActivity, datas);
         if (paths == null || paths.length == 0) {
             mUriValueCallbacks.onReceiveValue(null);
             return;
@@ -288,7 +288,7 @@ public class FileChooser {
         @Override
         public boolean handleMessage(final Message msg) {
 
-            AgentWebUtils.runOnUIThread(new Runnable() {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     FileChooser.AboveLCallback.this.safeHandleMessage(msg);
@@ -514,7 +514,7 @@ public class FileChooser {
         }
         if (PermissionUtils.isGranted(SuperAgentWebPermissions.STORAGE)) {
             FileChooserUtils.chooser(FileChooserUtils.ACTION_FILE,
-                    AgentWebUtils.getCommonFileIntentCompat(this.mIsAboveLollipop, this.mFileChooserParams, this.mAcceptType))
+                    SuperAgentWebUtils.getCommonFileIntentCompat(this.mIsAboveLollipop, this.mFileChooserParams, this.mAcceptType))
                     .callback(mChooserListener)
                     .open();
         } else {

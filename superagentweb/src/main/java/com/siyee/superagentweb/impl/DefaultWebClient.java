@@ -26,7 +26,7 @@ import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 
 import java.lang.ref.WeakReference;
@@ -151,7 +151,7 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
         this.mWebView = builder.mWebView;
         mWeakReference = new WeakReference<Activity>(builder.mActivity);
         this.mWebClientHelper = builder.mWebClientHelper;
-        mAgentWebUIController = new WeakReference<AbsAgentWebUIController>(AgentWebUtils.getAgentWebUIControllerByWebView(builder.mWebView));
+        mAgentWebUIController = new WeakReference<AbsAgentWebUIController>(SuperAgentWebUtils.getAgentWebUIControllerByWebView(builder.mWebView));
         this.mIsInterceptUnkownUrl = builder.mIsInterceptUnkownUrl;
         if (builder.mOpenOtherPageWays != null) {
             this.mOpenOtherPageWays = builder.mOpenOtherPageWays;
@@ -286,7 +286,7 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
         if (this.mDelegate != null && mWebClientHelper) {
             Method mMethod = this.onMainFrameErrorMethod;
             if (mMethod != null || (this.onMainFrameErrorMethod =
-                    mMethod = AgentWebUtils.isExistMethod(mDelegate,
+                    mMethod = SuperAgentWebUtils.isExistMethod(mDelegate,
                             "onMainFrameError", AbsAgentWebUIController.class,
                             WebView.class, int.class, String.class, String.class)) != null) {
                 try {
@@ -330,7 +330,7 @@ public class DefaultWebClient extends MiddlewareWebClientBase {
                 public void onPayResult(final H5PayResultModel result) {
                     final String url = result.getReturnUrl();
                     if (!TextUtils.isEmpty(url)) {
-                        AgentWebUtils.runOnUIThread(new Runnable() {
+                        SuperAgentWebUtils.runOnUIThread(new Runnable() {
                             @Override
                             public void run() {
                                 view.loadUrl(url);

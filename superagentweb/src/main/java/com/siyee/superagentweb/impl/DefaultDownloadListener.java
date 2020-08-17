@@ -15,7 +15,7 @@ import com.siyee.superagentweb.SuperAgentWebPermissions;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
 
@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * @author hackycy
  */
-public class DefaultDownloadImpl implements DownloadListener {
+public class DefaultDownloadListener implements DownloadListener {
 
     /**
      * Activity
@@ -45,11 +45,11 @@ public class DefaultDownloadImpl implements DownloadListener {
     /**
      * TAG 用于打印，标识
      */
-    private static final String TAG = DefaultDownloadImpl.class.getSimpleName();
+    private static final String TAG = DefaultDownloadListener.class.getSimpleName();
 
-    protected DefaultDownloadImpl(Activity activity, WebView webView, PermissionInterceptor permissionInterceptor) {
+    protected DefaultDownloadListener(Activity activity, WebView webView, PermissionInterceptor permissionInterceptor) {
         this.mPermissionInterceptor = permissionInterceptor;
-        this.mAbsAgentWebUIController = new WeakReference<AbsAgentWebUIController>(AgentWebUtils.getAgentWebUIControllerByWebView(webView));
+        this.mAbsAgentWebUIController = new WeakReference<AbsAgentWebUIController>(SuperAgentWebUtils.getAgentWebUIControllerByWebView(webView));
         this.mActivity = new WeakReference<Activity>(activity);
     }
 
@@ -57,7 +57,7 @@ public class DefaultDownloadImpl implements DownloadListener {
     public void onDownloadStart(final String url, final String userAgent, final String contentDisposition, final String mimetype, final long contentLength) {
         LogUtils.i(TAG, "url: " + url + ", userAgent: " + userAgent + ", mimetype: "
                 + mimetype + ", contentDisposition: " + contentDisposition + ", contentLength: " + contentLength);
-        AgentWebUtils.runOnUIThread(new Runnable() {
+        SuperAgentWebUtils.runOnUIThread(new Runnable() {
             @Override
             public void run() {
                 onDownloadStartInternal(url, userAgent, contentDisposition, mimetype, contentLength);
@@ -123,13 +123,13 @@ public class DefaultDownloadImpl implements DownloadListener {
             request.addRequestHeader("User-Agent", userAgent);
             if (null != this.mAbsAgentWebUIController.get()) {
                 this.mAbsAgentWebUIController.get()
-                        .onShowMessage(AgentWebUtils.getApp().getResources().getString(R.string.agentweb_coming_soon_download), "performDownload");
+                        .onShowMessage(SuperAgentWebUtils.getApp().getResources().getString(R.string.agentweb_coming_soon_download), "performDownload");
             }
             manager.enqueue(request);
         } catch (Exception e) {
             if (null != this.mAbsAgentWebUIController.get()) {
                 this.mAbsAgentWebUIController.get()
-                        .onShowMessage(AgentWebUtils.getApp().getResources().getString(R.string.agentweb_download_fail), "performDownload");
+                        .onShowMessage(SuperAgentWebUtils.getApp().getResources().getString(R.string.agentweb_download_fail), "performDownload");
             }
             if (SuperAgentWebConfig.DEBUG) {
                 e.printStackTrace();

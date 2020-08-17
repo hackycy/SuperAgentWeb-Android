@@ -24,7 +24,7 @@ import com.siyee.superagentweb.abs.IVideo;
 import com.siyee.superagentweb.abs.IndicatorController;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.FileChooserUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
@@ -100,7 +100,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
         this.mVideo = iVideo;
         this.mWebView = webView;
         this.mActivityWeakReference = new WeakReference<Activity>(activity);
-        mAgentWebUIController = new WeakReference<AbsAgentWebUIController>(AgentWebUtils.getAgentWebUIControllerByWebView(webView));
+        mAgentWebUIController = new WeakReference<AbsAgentWebUIController>(SuperAgentWebUtils.getAgentWebUIControllerByWebView(webView));
     }
 
     @Override

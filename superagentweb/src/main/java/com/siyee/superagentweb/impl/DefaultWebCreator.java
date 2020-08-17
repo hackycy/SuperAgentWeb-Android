@@ -16,7 +16,7 @@ import com.siyee.superagentweb.R;
 import com.siyee.superagentweb.abs.BaseIndicatorSpec;
 import com.siyee.superagentweb.abs.IWebLayout;
 import com.siyee.superagentweb.abs.WebCreator;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.widget.BaseIndicatorView;
 import com.siyee.superagentweb.widget.LollipopFixedWebView;
@@ -189,7 +189,7 @@ public class DefaultWebCreator implements WebCreator {
             FrameLayout.LayoutParams lp = null;
             WebIndicator mWebIndicator = new WebIndicator(mActivity);
             if (mHeight > 0) {
-                lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, AgentWebUtils.dp2px(mActivity, mHeight));
+                lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, SuperAgentWebUtils.dp2px(mActivity, mHeight));
             } else {
                 lp = mWebIndicator.offerLayoutParams();
             }

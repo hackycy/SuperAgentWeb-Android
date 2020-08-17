@@ -60,7 +60,7 @@ public final class PermissionUtils {
      * @return the permissions used in application
      */
     public static List<String> getPermissions() {
-        return getPermissions(AgentWebUtils.getApp().getPackageName());
+        return getPermissions(SuperAgentWebUtils.getApp().getPackageName());
     }
 
     /**
@@ -70,7 +70,7 @@ public final class PermissionUtils {
      * @return the permissions used in application
      */
     public static List<String> getPermissions(final String packageName) {
-        PackageManager pm = AgentWebUtils.getApp().getPackageManager();
+        PackageManager pm = SuperAgentWebUtils.getApp().getPackageManager();
         try {
             String[] permissions = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS).requestedPermissions;
             if (permissions == null) return Collections.emptyList();
@@ -99,7 +99,7 @@ public final class PermissionUtils {
     private static boolean isGranted(final String permission) {
         return Build.VERSION.SDK_INT < Build.VERSION_CODES.M
                 || PackageManager.PERMISSION_GRANTED
-                == ContextCompat.checkSelfPermission(AgentWebUtils.getApp(), permission);
+                == ContextCompat.checkSelfPermission(SuperAgentWebUtils.getApp(), permission);
     }
 
     /**
@@ -109,7 +109,7 @@ public final class PermissionUtils {
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static boolean isGrantedWriteSettings() {
-        return Settings.System.canWrite(AgentWebUtils.getApp());
+        return Settings.System.canWrite(SuperAgentWebUtils.getApp());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -125,8 +125,8 @@ public final class PermissionUtils {
     @TargetApi(Build.VERSION_CODES.M)
     private static void startWriteSettingsActivity(final Activity activity, final int requestCode) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
-        intent.setData(Uri.parse("package:" + AgentWebUtils.getApp().getPackageName()));
-        if (!AgentWebUtils.isIntentAvailable(intent)) {
+        intent.setData(Uri.parse("package:" + SuperAgentWebUtils.getApp().getPackageName()));
+        if (!SuperAgentWebUtils.isIntentAvailable(intent)) {
             launchAppDetailsSettings();
             return;
         }
@@ -140,7 +140,7 @@ public final class PermissionUtils {
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static boolean isGrantedDrawOverlays() {
-        return Settings.canDrawOverlays(AgentWebUtils.getApp());
+        return Settings.canDrawOverlays(SuperAgentWebUtils.getApp());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -156,8 +156,8 @@ public final class PermissionUtils {
     @TargetApi(Build.VERSION_CODES.M)
     private static void startOverlayPermissionActivity(final Activity activity, final int requestCode) {
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-        intent.setData(Uri.parse("package:" + AgentWebUtils.getApp().getPackageName()));
-        if (!AgentWebUtils.isIntentAvailable(intent)) {
+        intent.setData(Uri.parse("package:" + SuperAgentWebUtils.getApp().getPackageName()));
+        if (!SuperAgentWebUtils.isIntentAvailable(intent)) {
             launchAppDetailsSettings();
             return;
         }
@@ -168,9 +168,9 @@ public final class PermissionUtils {
      * Launch the application's details settings.
      */
     public static void launchAppDetailsSettings() {
-        Intent intent = AgentWebUtils.getLaunchAppDetailsSettingsIntent(AgentWebUtils.getApp().getPackageName(), true);
-        if (!AgentWebUtils.isIntentAvailable(intent)) return;
-        AgentWebUtils.getApp().startActivity(intent);
+        Intent intent = SuperAgentWebUtils.getLaunchAppDetailsSettingsIntent(SuperAgentWebUtils.getApp().getPackageName(), true);
+        if (!SuperAgentWebUtils.isIntentAvailable(intent)) return;
+        SuperAgentWebUtils.getApp().startActivity(intent);
     }
 
     /**

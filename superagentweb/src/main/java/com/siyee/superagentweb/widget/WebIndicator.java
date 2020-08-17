@@ -17,7 +17,7 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.Nullable;
 
 import com.siyee.superagentweb.abs.BaseIndicatorSpec;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 
 /**
@@ -99,7 +99,7 @@ public class WebIndicator extends BaseIndicatorView implements BaseIndicatorSpec
         mPaint.setDither(true);
         mPaint.setStrokeCap(Paint.Cap.SQUARE);
         mTargetWidth = context.getResources().getDisplayMetrics().widthPixels;
-        mWebIndicatorDefaultHeight = AgentWebUtils.dp2px(context, 3);
+        mWebIndicatorDefaultHeight = SuperAgentWebUtils.dp2px(context, 3);
     }
 
     public void setColor(int color) {

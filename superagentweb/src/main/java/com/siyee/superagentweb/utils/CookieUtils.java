@@ -117,11 +117,11 @@ public class CookieUtils {
      */
     public static synchronized void clearDiskCache(Context context) {
         try {
-            AgentWebUtils.clearCacheFolder(new File(AgentWebUtils.getCachePath(context)), 0);
-            String path = AgentWebUtils.getExternalCachePath(context);
+            SuperAgentWebUtils.clearCacheFolder(new File(SuperAgentWebUtils.getCachePath(context)), 0);
+            String path = SuperAgentWebUtils.getExternalCachePath(context);
             if (!TextUtils.isEmpty(path)) {
                 File mFile = new File(path);
-                AgentWebUtils.clearCacheFolder(mFile, 0);
+                SuperAgentWebUtils.clearCacheFolder(mFile, 0);
             }
         } catch (Throwable throwable) {
             if (LogUtils.isDebug()) {

@@ -5,7 +5,7 @@ import android.webkit.WebView;
 import androidx.annotation.NonNull;
 
 import com.siyee.superagentweb.abs.IUrlLoader;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 
 import java.util.Map;
 
@@ -22,8 +22,8 @@ public class UrlLoaderImpl implements IUrlLoader {
 
     @Override
     public void loadUrl(final String url) {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     loadUrl(url);
@@ -36,8 +36,8 @@ public class UrlLoaderImpl implements IUrlLoader {
 
     @Override
     public void loadUrl(final String url, final Map<String, String> headers) {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     loadUrl(url, headers);
@@ -54,8 +54,8 @@ public class UrlLoaderImpl implements IUrlLoader {
 
     @Override
     public void reload() {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     reload();
@@ -68,8 +68,8 @@ public class UrlLoaderImpl implements IUrlLoader {
 
     @Override
     public void loadData(final String data, final String mimeType, final String encoding) {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     loadData(data, mimeType, encoding);
@@ -82,8 +82,8 @@ public class UrlLoaderImpl implements IUrlLoader {
 
     @Override
     public void stopLoading() {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     stopLoading();
@@ -96,8 +96,8 @@ public class UrlLoaderImpl implements IUrlLoader {
 
     @Override
     public void loadDataWithBaseURL(final String baseUrl, final String data, final String mimeType, final String encoding, final String historyUrl) {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
@@ -110,8 +110,8 @@ public class UrlLoaderImpl implements IUrlLoader {
 
     @Override
     public void postUrl(final String url, final byte[] params) {
-        if (!AgentWebUtils.isUIThread()) {
-            AgentWebUtils.runOnUIThread(new Runnable() {
+        if (!SuperAgentWebUtils.isUIThread()) {
+            SuperAgentWebUtils.runOnUIThread(new Runnable() {
                 @Override
                 public void run() {
                     postUrl(url, params);

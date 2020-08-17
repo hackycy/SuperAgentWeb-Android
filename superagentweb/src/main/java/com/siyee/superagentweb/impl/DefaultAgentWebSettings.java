@@ -20,7 +20,7 @@ public class DefaultAgentWebSettings extends AbsAgentWebSettings {
     @Override
     public WebListenerManager setDownloader(WebView webView, DownloadListener downloadListener) {
         if (downloadListener == null) {
-            webView.setDownloadListener(new DefaultDownloadImpl(this.mSuperAgentWeb.getActivity(), webView, this.mSuperAgentWeb.getPermissionInterceptor()));
+            webView.setDownloadListener(new DefaultDownloadListener(this.mSuperAgentWeb.getActivity(), webView, this.mSuperAgentWeb.getPermissionInterceptor()));
             return this;
         }
         return super.setDownloader(webView, downloadListener);

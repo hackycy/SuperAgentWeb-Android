@@ -54,14 +54,14 @@ public class UtilsTransActivity extends AppCompatActivity {
                                 final TransActivityDelegate delegate,
                                 final Class<?> cls) {
         if (delegate == null) return;
-        Intent starter = new Intent(AgentWebUtils.getApp(), cls);
+        Intent starter = new Intent(SuperAgentWebUtils.getApp(), cls);
         starter.putExtra(EXTRA_DELEGATE, delegate);
         if (consumer != null) {
             consumer.accept(starter);
         }
         if (activity == null) {
             starter.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            AgentWebUtils.getApp().startActivity(starter);
+            SuperAgentWebUtils.getApp().startActivity(starter);
         } else {
             activity.startActivity(starter);
         }

@@ -12,7 +12,7 @@ import android.webkit.WebViewClient;
 
 import com.siyee.superagentweb.SuperAgentWeb;
 import com.siyee.superagentweb.SuperAgentWebConfig;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.ProcessUtils;
 
@@ -55,7 +55,7 @@ public abstract class AbsAgentWebSettings implements IAgentWebSettings, WebListe
         mWebSettings.setSupportZoom(true);
         mWebSettings.setSupportMultipleWindows(true);
         mWebSettings.setSavePassword(false);
-        if (AgentWebUtils.checkNetwork(webView.getContext())) {
+        if (SuperAgentWebUtils.checkNetwork(webView.getContext())) {
             //根据cache-control获取数据。
             mWebSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         } else {
@@ -101,7 +101,7 @@ public abstract class AbsAgentWebSettings implements IAgentWebSettings, WebListe
         mWebSettings.setDefaultFontSize(16);
         mWebSettings.setMinimumFontSize(8);//设置 WebView 支持的最小字体大小，默认为 8
         mWebSettings.setGeolocationEnabled(true);
-        String dir = AgentWebUtils.getCachePath(webView.getContext());
+        String dir = SuperAgentWebUtils.getCachePath(webView.getContext());
         LogUtils.i(TAG, "dir:" + dir + "   appcache:" + dir);
         //设置数据库路径  api19 已经废弃,这里只针对 webkit 起作用
         mWebSettings.setGeolocationDatabasePath(dir);

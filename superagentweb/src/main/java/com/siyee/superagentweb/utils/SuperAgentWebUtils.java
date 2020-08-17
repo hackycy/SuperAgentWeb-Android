@@ -40,6 +40,10 @@ import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -55,9 +59,9 @@ import static com.siyee.superagentweb.SuperAgentWebConfig.AGENTWEB_CACHE_PATCH;
  * @author hackycy
  * @date 2020/8/3
  */
-public class AgentWebUtils {
+public class SuperAgentWebUtils {
 
-    private static final String TAG = AgentWebUtils.class.getSimpleName();
+    private static final String TAG = SuperAgentWebUtils.class.getSimpleName();
 
     private static Toast mToast = null;
 
@@ -66,7 +70,7 @@ public class AgentWebUtils {
     @SuppressLint("StaticFieldLeak")
     private static Application sApp;
 
-    private AgentWebUtils() {
+    private SuperAgentWebUtils() {
         throw new UnsupportedOperationException("SuperAgentWebUtils can' t init");
     }
 
@@ -556,6 +560,29 @@ public class AgentWebUtils {
             }
         }
         return "";
+    }
+
+    /**
+     * 判断是否为Json字符串
+     * @param target
+     * @return
+     */
+    public static boolean isJson(String target) {
+        if (TextUtils.isEmpty(target)) {
+            return false;
+        }
+        boolean tag = false;
+        try {
+            if (target.startsWith("[")) {
+                new JSONArray(target);
+            } else {
+                new JSONObject(target);
+            }
+            tag = true;
+        } catch (JSONException ignore) {
+//            tag = false;
+        }
+        return tag;
     }
 
     public static Method isExistMethod(Object o, String methodName, Class... clazzs) {

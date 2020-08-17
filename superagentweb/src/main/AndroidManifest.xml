@@ -22,14 +22,5 @@
             android:theme="@style/SuperAgentWeb_ActivityTranslucent"
             android:windowSoftInputMode="stateHidden|stateAlwaysHidden" />
 
-<!--        &lt;!&ndash;  DefaultDownloadImpl DownloadManagerReceiver  &ndash;&gt;-->
-<!--        <receiver android:name="com.siyee.superagentweb.impl.DefaultDownloadImpl$DownloadManagerReceiver">-->
-<!--            <intent-filter>-->
-<!--                &lt;!&ndash; 配置 点击通知 和 下载完成 两个 action &ndash;&gt;-->
-<!--                <action android:name="android.intent.action.DOWNLOAD_NOTIFICATION_CLICKED"/>-->
-<!--                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>-->
-<!--            </intent-filter>-->
-<!--        </receiver>-->
-
     </application>
 </manifest>

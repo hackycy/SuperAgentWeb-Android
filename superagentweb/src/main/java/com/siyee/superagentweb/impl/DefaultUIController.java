@@ -16,7 +16,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.siyee.superagentweb.R;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
@@ -80,7 +80,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 			mAskOpenOtherAppDialog = new AlertDialog
 					.Builder(mActivity)
 					.setMessage(mResources.getString(R.string.agentweb_leave_app_and_go_other_page,
-							AgentWebUtils.getApplicationName(mActivity)))
+							SuperAgentWebUtils.getApplicationName(mActivity)))
 					.setTitle(mResources.getString(R.string.agentweb_tips))
 					.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 						@Override
@@ -317,12 +317,12 @@ public class DefaultUIController extends AbsAgentWebUIController {
 //		if (!TextUtils.isEmpty(from) && from.contains("performDownload")) {
 //			return;
 //		}
-		AgentWebUtils.toastShowShort(mActivity.getApplicationContext(), message);
+		SuperAgentWebUtils.toastShowShort(mActivity.getApplicationContext(), message);
 	}
 
 	@Override
 	public void onPermissionsDeny(String[] permissions, String action) {
-		AgentWebUtils.toastShowShort(mActivity.getApplicationContext(), mResources.getString(R.string.agentweb_permission_deny_tips));
+		SuperAgentWebUtils.toastShowShort(mActivity.getApplicationContext(), mResources.getString(R.string.agentweb_permission_deny_tips));
 	}
 
 	private void toCancelJsresult(JsResult result) {

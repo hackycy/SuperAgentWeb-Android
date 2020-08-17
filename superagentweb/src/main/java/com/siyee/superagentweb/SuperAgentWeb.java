@@ -22,21 +22,23 @@ import com.siyee.superagentweb.abs.IVideo;
 import com.siyee.superagentweb.abs.IWebLayout;
 import com.siyee.superagentweb.abs.IWebLifeCycle;
 import com.siyee.superagentweb.abs.IndicatorController;
+import com.siyee.superagentweb.abs.JsAccessEntrace;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.abs.WebCreator;
 import com.siyee.superagentweb.abs.WebListenerManager;
 import com.siyee.superagentweb.impl.AgentWebUIControllerImplBase;
 import com.siyee.superagentweb.impl.DefaultAgentWebSettings;
 import com.siyee.superagentweb.impl.DefaultChromeClient;
+import com.siyee.superagentweb.impl.DefaultJsAccessEntrace;
 import com.siyee.superagentweb.impl.DefaultWebClient;
 import com.siyee.superagentweb.impl.DefaultWebCreator;
-import com.siyee.superagentweb.impl.DefaultWebLifeCycleImpl;
+import com.siyee.superagentweb.impl.DefaultWebLifeCycle;
 import com.siyee.superagentweb.impl.EventHandlerImpl;
 import com.siyee.superagentweb.impl.UrlLoaderImpl;
 import com.siyee.superagentweb.impl.VideoImpl;
 import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
 import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
-import com.siyee.superagentweb.utils.AgentWebUtils;
+import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.utils.CookieUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.widget.BaseIndicatorView;
@@ -165,6 +167,11 @@ public class SuperAgentWeb {
     private MiddlewareWebChromeBase mMiddlewareWebChromeBaseHeader;
 
     /**
+     * 提供快速JS方法调用
+     */
+    private JsAccessEntrace mJsAccessEntrace;
+
+    /**
      * constructor
      * @param builder
      */
@@ -188,7 +195,7 @@ public class SuperAgentWeb {
             mWebParentLayout.setErrorLayoutRes(builder.mErrorLayout, builder.mReloadId);
             mWebParentLayout.setErrorView(builder.mErrorView);
         }
-        this.mWebLifeCycle = new DefaultWebLifeCycleImpl(this.mWebCreator.getWebView());
+        this.mWebLifeCycle = new DefaultWebLifeCycle(this.mWebCreator.getWebView());
         this.mWebClientHelper = builder.mWebClientHelper;
         this.mIsInterceptUnkownUrl = builder.mIsInterceptUnkownUrl;
         if (builder.mOpenOtherPageWays != null) {
@@ -204,7 +211,7 @@ public class SuperAgentWeb {
      */
     private void init() {
         if (this.mActivity != null) {
-            AgentWebUtils.init(mActivity.getApplication());
+            SuperAgentWebUtils.init(mActivity.getApplication());
         }
     }
 
@@ -405,6 +412,13 @@ public class SuperAgentWeb {
 
     public IAgentWebSettings getAgentWebSettings() {
         return this.mAgentWebSettings;
+    }
+
+    public JsAccessEntrace getJsAccessEntrace() {
+        if (this.mJsAccessEntrace == null) {
+            this.mJsAccessEntrace = new DefaultJsAccessEntrace(this.mWebCreator.getWebView());
+        }
+        return this.mJsAccessEntrace;
     }
 
     public IWebLifeCycle getWebLifeCycle() {
