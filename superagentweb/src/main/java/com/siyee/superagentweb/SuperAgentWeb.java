@@ -380,6 +380,15 @@ public class SuperAgentWeb {
         return this.mPermissionInterceptor;
     }
 
+    public SuperAgentWeb clearWebCache() {
+        if (this.getWebCreator().getWebView() != null) {
+            SuperAgentWebUtils.clearWebViewAllCache(mActivity, this.getWebCreator().getWebView());
+        } else {
+            SuperAgentWebUtils.clearWebViewAllCache(mActivity);
+        }
+        return this;
+    }
+
     public boolean back() {
         if (this.mEventHandler == null) {
             mEventHandler = EventHandlerImpl.getInstantce(mWebCreator.getWebView(), getInterceptor());

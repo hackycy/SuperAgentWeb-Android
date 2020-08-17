@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ import androidx.core.os.EnvironmentCompat;
 import com.siyee.superagentweb.R;
 import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
+import com.siyee.superagentweb.widget.LollipopFixedWebView;
 import com.siyee.superagentweb.widget.WebParentLayout;
 
 import org.json.JSONArray;
@@ -142,6 +144,7 @@ public class SuperAgentWebUtils {
         return mIntent;
     }
 
+    @SuppressLint("NewApi")
     public static Intent getCommonFileIntentCompat(boolean isAboveLollipop,
                                                    WebChromeClient.FileChooserParams fileChooserParams,
                                                    String acceptType) {
@@ -597,6 +600,42 @@ public class SuperAgentWebUtils {
         } catch (Throwable ignore) {}
         return null;
 
+    }
+
+    public static void clearAgentWebCache(Context context) {
+        try {
+            clearCacheFolder(new File(getAgentWebFilePath(context)), 0);
+        } catch (Throwable t) {
+            if (SuperAgentWebConfig.DEBUG) {
+                t.printStackTrace();
+            }
+        }
+    }
+
+    public static void clearWebViewAllCache(Context context, WebView webView) {
+        try {
+            CookieUtils.removeAllCookies(null);
+            webView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+            context.deleteDatabase("webviewCache.db");
+            context.deleteDatabase("webview.db");
+            webView.clearCache(true);
+            webView.clearHistory();
+            webView.clearFormData();
+            clearCacheFolder(new File(getCachePath(context)), 0);
+
+        } catch (Exception e) {
+            if (SuperAgentWebConfig.DEBUG) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void clearWebViewAllCache(Context context) {
+        try {
+            clearWebViewAllCache(context, new LollipopFixedWebView(context.getApplicationContext()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static int clearCacheFolder(final File dir, final int numDays) {
