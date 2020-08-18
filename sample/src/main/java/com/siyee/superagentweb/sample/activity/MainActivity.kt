@@ -1,10 +1,11 @@
-package com.siyee.superagentweb.sample
+package com.siyee.superagentweb.sample.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.FrameLayout
 import com.siyee.superagentweb.SuperAgentWeb
+import com.siyee.superagentweb.sample.R
 
 class MainActivity : AppCompatActivity() {
 
