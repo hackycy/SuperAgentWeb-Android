@@ -12,7 +12,6 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 
 import com.siyee.superagentweb.abs.AbsAgentWebSettings;
@@ -52,7 +51,7 @@ import java.lang.ref.WeakReference;
 /**
  * @author hackycy
  */
-public class SuperAgentWeb implements LifecycleObserver {
+public class SuperAgentWeb {
 
     /**
      * SuperAgentWeb 's TAG
@@ -445,17 +444,17 @@ public class SuperAgentWeb implements LifecycleObserver {
         this.mIUrlLoader.loadUrl(url);
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
+//    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResume() {
         this.mWebLifeCycle.onResume();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+//    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPause() {
         this.mWebLifeCycle.onPause();
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+//    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void onDestroy() {
         this.mWebLifeCycle.onDestroy();
     }
