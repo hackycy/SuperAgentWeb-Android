@@ -361,7 +361,7 @@ public class FileChooser {
     private void belowLollipopUriCallback(Intent data) {
         if (data == null) {
             if (mUriValueCallback != null) {
-                mUriValueCallback.onReceiveValue(Uri.EMPTY);
+                mUriValueCallback.onReceiveValue(null);
             }
             return;
         }
