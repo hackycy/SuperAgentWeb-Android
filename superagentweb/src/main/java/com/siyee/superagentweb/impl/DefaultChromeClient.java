@@ -23,7 +23,6 @@ import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.IVideo;
 import com.siyee.superagentweb.abs.IndicatorController;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
-import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
 import com.siyee.superagentweb.utils.FileChooserUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
@@ -36,7 +35,7 @@ import java.util.List;
 /**
  * @author hackycy
  */
-public class DefaultChromeClient extends MiddlewareWebChromeBase {
+public class DefaultChromeClient extends WebChromeClient {
 
     /**
      * DefaultChromeClient 's TAG
@@ -49,7 +48,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
     private WeakReference<Activity> mActivityWeakReference;
 
     /**
-     * Android WebChromeClient path ，用于反射，用户是否重写来该方法
+     * Android WebChromeClient path ，用于反射，用户是否重写了该方法
      */
     public static final String ANDROID_WEBCHROMECLIENT_PATH = "android.webkit.WebChromeClient";
 
@@ -90,11 +89,9 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
 
     public DefaultChromeClient(Activity activity,
                                IndicatorController indicatorController,
-                               WebChromeClient chromeClient,
                                @Nullable IVideo iVideo,
                                PermissionInterceptor permissionInterceptor,
                                WebView webView) {
-        super(chromeClient);
         this.mIndicatorController = indicatorController;
         this.mPermissionInterceptor = permissionInterceptor;
         this.mVideo = iVideo;
@@ -225,7 +222,7 @@ public class DefaultChromeClient extends MiddlewareWebChromeBase {
         return openFileChooserAboveL(webView, filePathCallback, fileChooserParams);
     }
 
-    @Override
+
     public void openFileChooser(ValueCallback<Uri> uploadFile, String acceptType, String capture) {
         createAndOpenCommonFileChooser(uploadFile, acceptType);
     }

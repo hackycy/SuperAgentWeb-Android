@@ -5,14 +5,14 @@ import android.app.Fragment;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.OnLifecycleEvent;
 
 import com.siyee.superagentweb.abs.AbsAgentWebSettings;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
@@ -38,10 +38,7 @@ import com.siyee.superagentweb.impl.DefaultWebLifeCycle;
 import com.siyee.superagentweb.impl.EventHandlerImpl;
 import com.siyee.superagentweb.impl.UrlLoaderImpl;
 import com.siyee.superagentweb.impl.VideoImpl;
-import com.siyee.superagentweb.middleware.MiddlewareWebChromeBase;
-import com.siyee.superagentweb.middleware.MiddlewareWebClientBase;
 import com.siyee.superagentweb.utils.CookieUtils;
-import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 import com.siyee.superagentweb.widget.BaseIndicatorView;
 import com.siyee.superagentweb.widget.WebParentLayout;
@@ -86,12 +83,12 @@ public class SuperAgentWeb {
     /**
      * WebChromeClient
      */
-    private com.siyee.superagentweb.WebChromeClient mWebChromeClient;
+    private WebChromeClient mWebChromeClient;
 
     /**
      * mWebViewClient
      */
-    private com.siyee.superagentweb.WebViewClient mWebViewClient;
+    private WebViewClient mWebViewClient;
 
     /**
      * is show indicator
@@ -146,6 +143,9 @@ public class SuperAgentWeb {
      */
     private boolean mIsInterceptUnkownUrl = false;
 
+    /**
+     * deepLink 打开方式
+     */
     private OpenOtherPageWays mOpenOtherPageWays = OpenOtherPageWays.ASK;
 
     /**
@@ -159,16 +159,6 @@ public class SuperAgentWeb {
     private EventInterceptor mEventInterceptor;
 
     /**
-     * MiddlewareWebClientBase WebViewClient 中间件
-     */
-    private MiddlewareWebClientBase mMiddleWrareWebClientBaseHeader;
-
-    /**
-     * MiddlewareWebChromeBase WebChromeClient 中间件
-     */
-    private MiddlewareWebChromeBase mMiddlewareWebChromeBaseHeader;
-
-    /**
      * 提供快速JS方法调用
      */
     private JsAccessEntrace mJsAccessEntrace;
@@ -178,10 +168,11 @@ public class SuperAgentWeb {
      * @param builder
      */
     private SuperAgentWeb(Builder builder) {
-        init();
         mTagTarget = builder.mTag;
         this.mActivity = builder.mActivity;
         this.mViewGroup = builder.mViewGroup;
+        // call init something pre
+        init();
         this.mEventHandler = builder.mEventHandler;
         this.mEnableIndicator = builder.mEnableIndicator;
         this.mWebCreator = builder.mWebCreator == null ? configWebCreator(builder.mBaseIndicatorView, builder.mIndex, builder.mLayoutParams,
@@ -204,8 +195,6 @@ public class SuperAgentWeb {
         if (builder.mOpenOtherPageWays != null) {
             this.mOpenOtherPageWays = builder.mOpenOtherPageWays;
         }
-        this.mMiddlewareWebChromeBaseHeader = builder.mMiddlewareWebChromeBaseHeader;
-        this.mMiddleWrareWebClientBaseHeader = builder.mMiddlewareWebClientBaseHeader;
     }
 
     /**
@@ -269,11 +258,10 @@ public class SuperAgentWeb {
     }
 
     /**
-     * get top WebViewClient
+     * get WebViewClient
      * @return
      */
     private android.webkit.WebViewClient getWebViewClient() {
-        LogUtils.i(TAG, "getDelegate:" + this.mMiddleWrareWebClientBaseHeader);
         DefaultWebClient defaultWebClient = DefaultWebClient.createBuilder()
                 .setActivity(this.mActivity)
                 .setWebClientHelper(this.mWebClientHelper)
@@ -281,29 +269,11 @@ public class SuperAgentWeb {
                 .setInterceptUnkownUrl(this.mIsInterceptUnkownUrl)
                 .setOpenOtherPageWays(this.mOpenOtherPageWays)
                 .build();
-        MiddlewareWebClientBase header = this.mMiddleWrareWebClientBaseHeader;
-        if (this.mWebViewClient != null) {
-            this.mWebViewClient.enq(this.mMiddleWrareWebClientBaseHeader);
-            header = this.mWebViewClient;
-        }
-        if (header != null) {
-            MiddlewareWebClientBase tail = header;
-            int count = 1;
-            MiddlewareWebClientBase tmp = header;
-            while (tmp.next() != null) {
-                tail = tmp = tmp.next();
-                count++;
-            }
-            LogUtils.i(TAG, "MiddlewareWebClientBase middleware count:" + count);
-            tail.setDelegate(defaultWebClient);
-            return header;
-        } else {
-            return defaultWebClient;
-        }
+        return this.mWebViewClient != null ? this.mWebViewClient : defaultWebClient;
     }
 
     /**
-     * get top WebChromeClient
+     * get WebChromeClient
      * @return
      */
     private android.webkit.WebChromeClient getWebChromeClient() {
@@ -313,29 +283,9 @@ public class SuperAgentWeb {
                         : this.mIndicatorController;
         DefaultChromeClient defaultChromeClient =
                 new DefaultChromeClient(this.mActivity,
-                        this.mIndicatorController = mIndicatorController,
-                        null, this.mIVideo = getIVideo(),
+                        this.mIndicatorController = mIndicatorController, this.mIVideo = getIVideo(),
                         this.mPermissionInterceptor, mWebCreator.getWebView());
-        LogUtils.i(TAG, "WebChromeClient:" + this.mWebChromeClient);
-        MiddlewareWebChromeBase header = this.mMiddlewareWebChromeBaseHeader;
-        if (this.mWebChromeClient != null) {
-            this.mWebChromeClient.enq(header);
-            header = this.mWebChromeClient;
-        }
-        if (header != null) {
-            MiddlewareWebChromeBase tail = header;
-            int count = 1;
-            MiddlewareWebChromeBase tmp = header;
-            for (; tmp.next() != null; ) {
-                tail = tmp = tmp.next();
-                count++;
-            }
-            LogUtils.i(TAG, "MiddlewareWebClientBase middleware count:" + count);
-            tail.setDelegate(defaultChromeClient);
-            return header;
-        } else {
-            return defaultChromeClient;
-        }
+        return this.mWebChromeClient != null ? this.mWebChromeClient : defaultChromeClient;
     }
 
     /**
@@ -500,12 +450,8 @@ public class SuperAgentWeb {
         private IEventHandler mEventHandler;
 
         /** Client And Middleware **/
-        private com.siyee.superagentweb.WebChromeClient mWebChromeClient;
-        private com.siyee.superagentweb.WebViewClient mWebViewClient;
-        private MiddlewareWebClientBase mMiddlewareWebClientBaseHeader;
-        private MiddlewareWebClientBase mMiddlewareWebClientBaseTail;
-        private MiddlewareWebChromeBase mMiddlewareWebChromeBaseHeader;
-        private MiddlewareWebChromeBase mMiddlewareWebChromeBaseTail;
+        private WebChromeClient mWebChromeClient;
+        private WebViewClient mWebViewClient;
 
         public Builder(@NonNull Activity activity, @NonNull Fragment fragment) {
             mActivity = activity;
@@ -622,39 +568,13 @@ public class SuperAgentWeb {
             return this;
         }
 
-        public Builder setWebChromeClient(@Nullable com.siyee.superagentweb.WebChromeClient chromeClient) {
+        public Builder setWebChromeClient(@Nullable WebChromeClient chromeClient) {
             this.mWebChromeClient = chromeClient;
             return this;
         }
 
-        public Builder setWebViewClient(@Nullable com.siyee.superagentweb.WebViewClient webViewClient) {
+        public Builder setWebViewClient(@Nullable WebViewClient webViewClient) {
             this.mWebViewClient = webViewClient;
-            return this;
-        }
-
-        public Builder useMiddlewareWebClient(@Nullable MiddlewareWebClientBase middlewareWebClientBase) {
-            if (middlewareWebClientBase == null) {
-                return this;
-            }
-            if (this.mMiddlewareWebClientBaseHeader == null) {
-                this.mMiddlewareWebClientBaseHeader = this.mMiddlewareWebClientBaseTail = middlewareWebClientBase;
-            } else {
-                this.mMiddlewareWebClientBaseTail.enq(middlewareWebClientBase);
-                this.mMiddlewareWebClientBaseTail = middlewareWebClientBase;
-            }
-            return this;
-        }
-
-        public Builder useMiddlewareWebChrome(@Nullable MiddlewareWebChromeBase middlewareWebChromeBase) {
-            if (middlewareWebChromeBase == null) {
-                return this;
-            }
-            if (this.mMiddlewareWebChromeBaseHeader == null) {
-                this.mMiddlewareWebChromeBaseHeader = this.mMiddlewareWebChromeBaseTail = middlewareWebChromeBase;
-            } else {
-                this.mMiddlewareWebChromeBaseTail.enq(middlewareWebChromeBase);
-                this.mMiddlewareWebChromeBaseTail = middlewareWebChromeBase;
-            }
             return this;
         }
 

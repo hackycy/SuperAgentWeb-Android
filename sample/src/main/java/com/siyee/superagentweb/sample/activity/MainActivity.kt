@@ -1,5 +1,6 @@
 package com.siyee.superagentweb.sample.activity
 
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.KeyEvent
@@ -16,6 +17,7 @@ class MainActivity : AppCompatActivity() {
     val agentweb: SuperAgentWeb by lazy {
         SuperAgentWeb.with(this)
             .setAgentWebParent(fl, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+            .useDefaultIndicator(Color.BLACK)
             .interceptUnkownUrl()
             .build()
     }
