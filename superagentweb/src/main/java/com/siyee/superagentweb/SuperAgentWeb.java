@@ -178,6 +178,7 @@ public class SuperAgentWeb {
      * @param builder
      */
     private SuperAgentWeb(Builder builder) {
+        init();
         mTagTarget = builder.mTag;
         this.mActivity = builder.mActivity;
         this.mViewGroup = builder.mViewGroup;
@@ -205,7 +206,6 @@ public class SuperAgentWeb {
         }
         this.mMiddlewareWebChromeBaseHeader = builder.mMiddlewareWebChromeBaseHeader;
         this.mMiddleWrareWebClientBaseHeader = builder.mMiddlewareWebClientBaseHeader;
-        init();
     }
 
     /**
