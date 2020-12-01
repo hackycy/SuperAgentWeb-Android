@@ -222,13 +222,19 @@ public class DefaultChromeClient extends WebChromeClient {
         return openFileChooserAboveL(webView, filePathCallback, fileChooserParams);
     }
 
-
+    /**
+     * Android  >= 4.1
+     *
+     * @param uploadFile
+     * @param acceptType
+     * @param capture
+     */
     public void openFileChooser(ValueCallback<Uri> uploadFile, String acceptType, String capture) {
         createAndOpenCommonFileChooser(uploadFile, acceptType);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private boolean openFileChooserAboveL(WebView webView, ValueCallback<Uri[]> valueCallbacks, FileChooserParams fileChooserParams) {
+    protected boolean openFileChooserAboveL(WebView webView, ValueCallback<Uri[]> valueCallbacks, FileChooserParams fileChooserParams) {
         LogUtils.i(TAG, "fileChooserParams:" + Arrays.toString(fileChooserParams.getAcceptTypes())
                 + "  getTitle:" + fileChooserParams.getTitle() + " accept:"
                 + Arrays.toString(fileChooserParams.getAcceptTypes()) + " length:"
@@ -250,7 +256,7 @@ public class DefaultChromeClient extends WebChromeClient {
         );
     }
 
-    private void createAndOpenCommonFileChooser(ValueCallback<Uri> valueCallback, String mimeType) {
+    protected void createAndOpenCommonFileChooser(ValueCallback<Uri> valueCallback, String mimeType) {
         Activity mActivity = this.mActivityWeakReference.get();
         if (mActivity == null || mActivity.isFinishing()) {
             valueCallback.onReceiveValue(Uri.EMPTY);

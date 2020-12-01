@@ -277,7 +277,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param description
      * @param failingUrl
      */
-    private void onMainFrameError(WebView view, int errorCode, String description, String failingUrl) {
+    protected void onMainFrameError(WebView view, int errorCode, String description, String failingUrl) {
         LogUtils.e(TAG, "onReceivedError：" + description + "  Code:" + errorCode);
         mErrorUrlsSet.add(failingUrl);
         // 下面逻辑判断开发者是否重写了 onMainFrameError 方法 ， 优先交给开发者处理
@@ -308,7 +308,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param url
      * @return
      */
-    private boolean isAlipay(final WebView view, String url) {
+    protected boolean isAlipay(final WebView view, String url) {
         try {
             Activity mActivity = null;
             if ((mActivity = mWeakReference.get()) == null) {
@@ -350,7 +350,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param url
      * @return
      */
-    private boolean handleCommonLink(String url) {
+    protected boolean handleCommonLink(String url) {
         if (url.startsWith(WebView.SCHEME_TEL)
                 || url.startsWith(SCHEME_SMS)
                 || url.startsWith(WebView.SCHEME_MAILTO)
@@ -377,7 +377,7 @@ public class DefaultWebClient extends WebViewClient {
      * handleIntentUrl
      * @param intentUrl
      */
-    private void handleIntentUrl(String intentUrl) {
+    protected void handleIntentUrl(String intentUrl) {
         try {
             Intent intent = null;
             if (TextUtils.isEmpty(intentUrl) || !intentUrl.startsWith(INTENT_SCHEME)) {
@@ -398,7 +398,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param url
      * @return
      */
-    private boolean deepLink(String url) {
+    protected boolean deepLink(String url) {
         switch (mOpenOtherPageWays) {
             // 直接打开其他App
             case DERECT:
@@ -439,7 +439,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param url
      * @return
      */
-    private boolean lookup(String url) {
+    protected boolean lookup(String url) {
         try {
             Intent intent;
             Activity mActivity = null;
@@ -469,7 +469,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param url
      * @return
      */
-    private ResolveInfo lookupResolveInfo(String url) {
+    protected ResolveInfo lookupResolveInfo(String url) {
         try {
             Intent intent;
             Activity mActivity = null;
@@ -493,7 +493,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param url
      * @return
      */
-    private Callback<Integer> getCallback(String url) {
+    protected Callback<Integer> getCallback(String url) {
         final String copyUrl = String.copyValueOf(url.toCharArray());
         return new Callback<Integer>() {
 
@@ -512,7 +512,7 @@ public class DefaultWebClient extends WebViewClient {
      * @param url
      * @return
      */
-    private int queryActiviesNumber(String url) {
+    protected int queryActiviesNumber(String url) {
         try {
             if (mWeakReference.get() == null) {
                 return 0;
@@ -533,7 +533,7 @@ public class DefaultWebClient extends WebViewClient {
      * startActivity
      * @param url
      */
-    private void startActivity(String url) {
+    protected void startActivity(String url) {
         try {
             if (mWeakReference.get() == null) {
                 return;
