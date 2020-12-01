@@ -335,18 +335,18 @@ public class WebChromeClientDelegate extends WebChromeClient {
         commonReflect(this.mDelegate, "openFileChooser", new Object[]{uploadFile, acceptType, capture}, ValueCallback.class, String.class, String.class);
     }
 
-    /**
-     * Android < 3.0
-     * minSdk > 4.4 so remove
-     */
+//    /**
+//     * Android < 3.0
+//     * minSdk > 4.4 so remove
+//     */
 //    public void openFileChooser(ValueCallback<Uri> valueCallback) {
 //        commonReflect(this.mDelegate, "openFileChooser", new Object[]{valueCallback}, ValueCallback.class);
 //    }
 
-    /**
-     * Android  >= 3.0
-     * minSdk > 4.4 so remove
-     */
+//    /**
+//     * Android  >= 3.0
+//     * minSdk > 4.4 so remove
+//     */
 //    public void openFileChooser(ValueCallback valueCallback, String acceptType) {
 //        commonReflect(this.mDelegate, "openFileChooser", new Object[]{valueCallback, acceptType}, ValueCallback.class, String.class);
 //    }
