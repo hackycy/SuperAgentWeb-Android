@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>测试Bridge</title>
+    <style>
+        body {
+            font-size: 25px;
+        }
+    </style>
+    <script src="https://unpkg.com/@hackycy/jsbridge@0.0.5/dist/jsbridge.min.js"></script>
+</head>
+<body>
+    <button onclick="testFunction()">测试JSBridge</button>
+    <script>
+        function testFunction() {
+            try {
+                window.JSBridge.invoke('log', null, callback)
+            } catch (e) {
+                alert(e.toString())
+            }
+        }
+
+        function callback(obj) {
+            alert(obj.msg)
+        }
+    </script>
+</body>
+</html>
