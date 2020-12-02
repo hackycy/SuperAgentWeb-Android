@@ -1,10 +1,12 @@
 package com.siyee.superagentweb;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -28,6 +30,8 @@ import com.siyee.superagentweb.abs.JsAccessEntrace;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
 import com.siyee.superagentweb.abs.WebCreator;
 import com.siyee.superagentweb.abs.WebListenerManager;
+import com.siyee.superagentweb.bridge.IExecutorFactory;
+import com.siyee.superagentweb.bridge.InternalBridge;
 import com.siyee.superagentweb.impl.AgentWebUIControllerImplBase;
 import com.siyee.superagentweb.impl.DefaultAgentWebSettings;
 import com.siyee.superagentweb.impl.DefaultChromeClient;
@@ -164,6 +168,11 @@ public class SuperAgentWeb {
     private JsAccessEntrace mJsAccessEntrace;
 
     /**
+     * Internal JS Bridge
+     */
+    private InternalBridge mInternalBridge;
+
+    /**
      * constructor
      * @param builder
      */
@@ -195,6 +204,7 @@ public class SuperAgentWeb {
         if (builder.mOpenOtherPageWays != null) {
             this.mOpenOtherPageWays = builder.mOpenOtherPageWays;
         }
+        this.mInternalBridge = new InternalBridge(builder.mExecutorFactory, this.mWebCreator.getWebView());
     }
 
     /**
@@ -228,6 +238,8 @@ public class SuperAgentWeb {
             mWebListenerManager.setWebChromeClient(mWebCreator.getWebView(), getWebChromeClient());
             mWebListenerManager.setWebViewClient(mWebCreator.getWebView(), getWebViewClient());
         }
+        // Inject JSBridge
+        this.mWebCreator.getWebView().addJavascriptInterface(this.mInternalBridge, InternalBridge.INTERNAL_BRIDGE_NAME);
         return this;
     }
 
@@ -348,6 +360,11 @@ public class SuperAgentWeb {
         return mEventHandler.back();
     }
 
+    @SuppressLint("JavascriptInterface")
+    public void addJavascriptInterface(Object object, String name) {
+        this.getWebCreator().getWebView().addJavascriptInterface(object, name);
+    }
+
     public boolean handleKeyEvent(int keyCode, KeyEvent keyEvent) {
         if (this.mEventHandler == null) {
             this.mEventHandler = EventHandlerImpl.getInstantce(mWebCreator.getWebView(), getInterceptor());
@@ -394,17 +411,14 @@ public class SuperAgentWeb {
         this.mIUrlLoader.loadUrl(url);
     }
 
-//    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     public void onResume() {
         this.mWebLifeCycle.onResume();
     }
 
-//    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     public void onPause() {
         this.mWebLifeCycle.onPause();
     }
 
-//    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     public void onDestroy() {
         this.mWebLifeCycle.onDestroy();
     }
@@ -448,6 +462,7 @@ public class SuperAgentWeb {
         private PermissionInterceptor mPermissionInterceptor;
         private AbsAgentWebUIController mAgentWebUIController;
         private IEventHandler mEventHandler;
+        private IExecutorFactory mExecutorFactory;
 
         /** Client And Middleware **/
         private WebChromeClient mWebChromeClient;
@@ -565,6 +580,11 @@ public class SuperAgentWeb {
 
         public Builder setEventHanadler(@Nullable IEventHandler iEventHandler) {
             this.mEventHandler = iEventHandler;
+            return this;
+        }
+
+        public Builder setExecutorFactory(@Nullable IExecutorFactory executorFactory) {
+            this.mExecutorFactory = executorFactory;
             return this;
         }
 

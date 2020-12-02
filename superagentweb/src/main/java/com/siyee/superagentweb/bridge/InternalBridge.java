@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
  */
 public class InternalBridge {
 
+    public static String INTERNAL_BRIDGE_NAME = "invokeHandler";
+
     private IExecutorFactory mFactory;
     private WebView mWebView;
 
