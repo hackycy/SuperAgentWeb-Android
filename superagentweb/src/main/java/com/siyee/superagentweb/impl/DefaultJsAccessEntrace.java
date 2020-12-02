@@ -13,7 +13,6 @@ import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 public class DefaultJsAccessEntrace implements JsAccessEntrace {
 
     private WebView mWebView;
-    private static String CALL_BRIDGE_FUNC = "window._handleMessageFromNative(%s, %s)";
 
     public DefaultJsAccessEntrace(WebView webView) {
         this.mWebView = webView;
@@ -53,10 +52,6 @@ public class DefaultJsAccessEntrace implements JsAccessEntrace {
     @Override
     public void quickCallJs(String method) {
         this.quickCallJs(method, null, (String[]) null);
-    }
-
-    public void callBridge(String func, ValueCallback<String> callback) {
-        // TODO call bridge
     }
 
     private String concat(String...params){
