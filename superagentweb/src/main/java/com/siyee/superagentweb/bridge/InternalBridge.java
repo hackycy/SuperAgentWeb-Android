@@ -16,7 +16,7 @@ import com.siyee.superagentweb.utils.SuperAgentWebUtils;
  */
 public class InternalBridge {
 
-    public static String INTERNAL_BRIDGE_NAME = "invokeHandler";
+    public static String INTERNAL_BRIDGE_NAME = "_invokeHandler";
 
     private IExecutorFactory mFactory;
     private WebView mWebView;
