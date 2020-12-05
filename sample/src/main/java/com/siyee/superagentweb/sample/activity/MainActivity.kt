@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
             .setExecutorFactory(IExecutorFactory { _, url, func, paramString ->
                 if (func == "log") {
                     Log.e("SuperAgentWeb", if (TextUtils.isEmpty(paramString)) "nothing" else paramString)
-                    return@IExecutorFactory "{ \"msg\": 2 }"
+                    return@IExecutorFactory "{ \"msg\": $paramString }"
                 } else {
                     Log.e("SuperAgentWeb", "nothong to log func : $func url : $url")
                     return@IExecutorFactory ""

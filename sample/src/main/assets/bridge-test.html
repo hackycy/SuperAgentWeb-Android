@@ -26,12 +26,12 @@
         }
 
         function testSyncFunction() {
-            var result = window.JSBridge.invokeSync('log', null, callback)
-            alert(result.msg)
+            var result = window.JSBridge.invokeSync('log', { o: 2 }, callback)
+            alert(JSON.stringify(result.msg))
         }
 
         function callback(obj) {
-            alert(obj.msg)
+            alert(JSON.stringify(obj))
         }
     </script>
 </body>
