@@ -156,16 +156,12 @@ public class DefaultChromeClient extends WebChromeClient {
 
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
-        if (this.mInternalBridge.getFactory() != null && !TextUtils.isEmpty(message) && message.startsWith(InternalBridge.URL_SCHEME)) {
+        if (this.mInternalBridge.getFactory() != null && !TextUtils.isEmpty(message)
+                && message.startsWith(InternalBridge.URL_SCHEME)) {
             // Bridge Invoke
-            try {
-                URI scheme = new URI(message);
-                String func = scheme.getHost();
-                String execResult = this.mInternalBridge.getFactory().exec(false, url, func, defaultValue);
-                result.confirm(execResult);
-            } catch (Exception e) {
-                this.mInternalBridge.consoleError("Bridge Error: URL SCHEME is invalid");
-            }
+            String func = message.replace(InternalBridge.URL_SCHEME, "");
+            String execResult = this.mInternalBridge.getFactory().exec(false, url, func, defaultValue);
+            result.confirm(execResult);
             return true;
         }
         try {
