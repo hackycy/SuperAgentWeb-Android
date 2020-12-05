@@ -467,13 +467,13 @@ public class SuperAgentWeb {
         private WebChromeClient mWebChromeClient;
         private WebViewClient mWebViewClient;
 
-        public Builder(@NonNull Activity activity, @NonNull Fragment fragment) {
+        private Builder(@NonNull Activity activity, @NonNull Fragment fragment) {
             mActivity = activity;
             mFragment = fragment;
             mTag = SuperAgentWeb.FRAGMENT_TAG;
         }
 
-        public Builder(@NonNull Activity activity) {
+        private Builder(@NonNull Activity activity) {
             mActivity = activity;
             mTag = SuperAgentWeb.ACTIVITY_TAG;
         }
