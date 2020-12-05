@@ -55,7 +55,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 		} catch (Exception ignore) {}
 		mAlertDialog = new AlertDialog.Builder(mActivity)
 				.setMessage(message)
-				.setTitle(TextUtils.isEmpty(host) ? "Unkonwn" : host)
+				.setTitle(TextUtils.isEmpty(host) ? mResources.getString(R.string.superagentweb_tips) : host)
 				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -79,9 +79,9 @@ public class DefaultUIController extends AbsAgentWebUIController {
 		if (mAskOpenOtherAppDialog == null) {
 			mAskOpenOtherAppDialog = new AlertDialog
 					.Builder(mActivity)
-					.setMessage(mResources.getString(R.string.agentweb_leave_app_and_go_other_page,
+					.setMessage(mResources.getString(R.string.superagentweb_leave_app_and_go_other_page,
 							SuperAgentWebUtils.getApplicationName(mActivity)))
-					.setTitle(mResources.getString(R.string.agentweb_tips))
+					.setTitle(mResources.getString(R.string.superagentweb_tips))
 					.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -90,7 +90,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 							}
 						}
 					})
-					.setPositiveButton(mResources.getString(R.string.agentweb_leave), new DialogInterface.OnClickListener() {
+					.setPositiveButton(mResources.getString(R.string.superagentweb_leave), new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							if (callback != null) {
@@ -192,9 +192,9 @@ public class DefaultUIController extends AbsAgentWebUIController {
 			return;
 		}
 		mAlertDialog = new AlertDialog.Builder(mActivity)
-				.setTitle(mResources.getString(R.string.agentweb_tips))
-				.setMessage(mResources.getString(R.string.agentweb_performdownload))
-				.setNegativeButton(mResources.getString(R.string.agentweb_download), new DialogInterface.OnClickListener() {
+				.setTitle(mResources.getString(R.string.superagentweb_tips))
+				.setMessage(mResources.getString(R.string.superagentweb_performdownload))
+				.setNegativeButton(mResources.getString(R.string.superagentweb_download), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if (dialog != null) {
@@ -205,7 +205,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 						}
 					}
 				})//
-				.setPositiveButton(mResources.getString(R.string.agentweb_cancel), new DialogInterface.OnClickListener() {
+				.setPositiveButton(mResources.getString(R.string.superagentweb_cancel), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if (dialog != null) {
@@ -322,7 +322,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 
 	@Override
 	public void onPermissionsDeny(String[] permissions, String action) {
-		SuperAgentWebUtils.toastShowShort(mActivity.getApplicationContext(), mResources.getString(R.string.agentweb_permission_deny_tips));
+		SuperAgentWebUtils.toastShowShort(mActivity.getApplicationContext(), mResources.getString(R.string.superagentweb_permission_deny_tips));
 	}
 
 	private void toCancelJsresult(JsResult result) {

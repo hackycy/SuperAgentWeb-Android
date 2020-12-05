@@ -160,9 +160,9 @@ public class FileChooser {
                     .get()
                     .onSelectItemsPrompt(this.mWebView, mWebView.getUrl(),
                             new String[]{
-                                    mActivity.getString(R.string.agentweb_camera),
-                                    mActivity.getString(R.string.agentweb_album),
-                                    mActivity.getString(R.string.agentweb_file_chooser)},
+                                    mActivity.getString(R.string.superagentweb_camera),
+                                    mActivity.getString(R.string.superagentweb_album),
+                                    mActivity.getString(R.string.superagentweb_file_chooser)},
                             getCallback());
         }
     }
@@ -269,7 +269,7 @@ public class FileChooser {
             return;
         }
         final String path = paths[0];
-        mAgentWebUIController.get().onLoading(mActivity.getString(R.string.agentweb_loading));
+        mAgentWebUIController.get().onLoading(mActivity.getString(R.string.superagentweb_loading));
         AsyncTask.THREAD_POOL_EXECUTOR.execute(new WaitPhotoRunnable(path, new AboveLCallback(mUriValueCallbacks, datas, mAgentWebUIController)));
 
     }

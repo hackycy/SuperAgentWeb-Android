@@ -123,13 +123,13 @@ public class DefaultDownloadListener implements DownloadListener {
             request.addRequestHeader("User-Agent", userAgent);
             if (null != this.mAbsAgentWebUIController.get()) {
                 this.mAbsAgentWebUIController.get()
-                        .onShowMessage(SuperAgentWebUtils.getApp().getResources().getString(R.string.agentweb_coming_soon_download), "performDownload");
+                        .onShowMessage(SuperAgentWebUtils.getApp().getResources().getString(R.string.superagentweb_coming_soon_download), "performDownload");
             }
             manager.enqueue(request);
         } catch (Exception e) {
             if (null != this.mAbsAgentWebUIController.get()) {
                 this.mAbsAgentWebUIController.get()
-                        .onShowMessage(SuperAgentWebUtils.getApp().getResources().getString(R.string.agentweb_download_fail), "performDownload");
+                        .onShowMessage(SuperAgentWebUtils.getApp().getResources().getString(R.string.superagentweb_download_fail), "performDownload");
             }
             if (SuperAgentWebConfig.DEBUG) {
                 e.printStackTrace();
