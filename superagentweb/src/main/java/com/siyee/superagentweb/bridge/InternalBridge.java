@@ -31,6 +31,10 @@ public class InternalBridge {
         this.mJsAccessEntrace = jsAccessEntrace;
     }
 
+    public IExecutorFactory getFactory() {
+        return mFactory;
+    }
+
     private void invokeCallbackToJs(int callbackId, @Nullable String result) {
         this.mJsAccessEntrace.callJs(String
                 .format(INVOKE_CALLBACK_BRIDGE_FUNC, callbackId, TextUtils.isEmpty(result) ? "{}" : result));
@@ -45,7 +49,7 @@ public class InternalBridge {
         SuperAgentWebUtils.runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                String result = mFactory.exec(mWebView.getUrl(), func, paramString, callbackId);
+                String result = mFactory.exec(mWebView.getUrl(), func, paramString);
                 invokeCallbackToJs(callbackId, result);
             }
         });

@@ -5,6 +5,6 @@ package com.siyee.superagentweb.bridge;
  */
 public interface IExecutorFactory {
 
-    String exec(String url, String func, String paramString, int callbackId);
+    String exec(String url, String func, String paramString);
 
 }
