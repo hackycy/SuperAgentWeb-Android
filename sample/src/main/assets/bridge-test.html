@@ -11,10 +11,11 @@
             font-size: 25px;
         }
     </style>
-    <script src="https://unpkg.com/@hackycy/jsbridge@0.0.5/dist/jsbridge.min.js"></script>
+    <script src="https://unpkg.com/@hackycy/jsbridge@0.0.8/dist/jsbridge.min.js"></script>
 </head>
 <body>
-    <button onclick="testFunction()">测试JSBridge</button>
+    <button onclick="testFunction()">测试异步执行JSBridge</button>
+    <button onclick="testSyncFunction()">测试同步执行JSBridge</button>
     <script>
         function testFunction() {
             try {
@@ -22,6 +23,11 @@
             } catch (e) {
                 alert(e.toString())
             }
+        }
+
+        function testSyncFunction() {
+            var result = window.JSBridge.invokeSync('log', null, callback)
+            alert(result.msg)
         }
 
         function callback(obj) {

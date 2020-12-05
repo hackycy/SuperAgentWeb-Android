@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
             .setAgentWebParent(fl, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
             .useDefaultIndicator(Color.BLACK)
             .interceptUnkownUrl()
-            .setExecutorFactory(IExecutorFactory { url, func, paramString, _ ->
+            .setExecutorFactory(IExecutorFactory { _, url, func, paramString ->
                 if (func == "log") {
                     Log.e("SuperAgentWeb", if (TextUtils.isEmpty(paramString)) "nothing" else paramString)
                     return@IExecutorFactory "{ \"msg\": 2 }"
