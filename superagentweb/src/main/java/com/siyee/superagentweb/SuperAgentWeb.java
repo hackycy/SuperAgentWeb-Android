@@ -6,9 +6,7 @@ import android.app.Fragment;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
@@ -272,7 +270,7 @@ public class SuperAgentWeb {
      * get WebViewClient
      * @return
      */
-    private android.webkit.WebViewClient getWebViewClient() {
+    private WebViewClient getWebViewClient() {
         DefaultWebClient defaultWebClient = DefaultWebClient.createBuilder()
                 .setActivity(this.mActivity)
                 .setWebClientHelper(this.mWebClientHelper)
@@ -280,14 +278,18 @@ public class SuperAgentWeb {
                 .setInterceptUnkownUrl(this.mIsInterceptUnkownUrl)
                 .setOpenOtherPageWays(this.mOpenOtherPageWays)
                 .build();
-        return this.mWebViewClient != null ? this.mWebViewClient : defaultWebClient;
+        if (this.mWebViewClient == null) {
+            return defaultWebClient;
+        }
+        mWebViewClient.setDelegate(defaultWebClient);
+        return mWebViewClient;
     }
 
     /**
      * get WebChromeClient
      * @return
      */
-    private android.webkit.WebChromeClient getWebChromeClient() {
+    private WebChromeClient getWebChromeClient() {
         IndicatorController mIndicatorController =
                 (this.mIndicatorController == null) ?
                         IndicatorHandler.getInstance().inJectIndicator(mWebCreator.offer())
@@ -295,8 +297,12 @@ public class SuperAgentWeb {
         DefaultChromeClient defaultChromeClient =
                 new DefaultChromeClient(this.mActivity,
                         this.mIndicatorController = mIndicatorController, this.mIVideo = getIVideo(),
-                        this.mPermissionInterceptor, mWebCreator.getWebView());
-        return this.mWebChromeClient != null ? this.mWebChromeClient : defaultChromeClient;
+                        this.mPermissionInterceptor, this.mInternalBridge, mWebCreator.getWebView());
+        if (this.mWebChromeClient == null) {
+            return defaultChromeClient;
+        }
+        mWebChromeClient.setDelegate(defaultChromeClient);
+        return mWebChromeClient;
     }
 
     /**

@@ -14,7 +14,6 @@ import android.text.TextUtils;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import androidx.annotation.RequiresApi;
 
@@ -23,6 +22,7 @@ import com.alipay.sdk.app.PayTask;
 import com.alipay.sdk.util.H5PayResultModel;
 import com.siyee.superagentweb.OpenOtherPageWays;
 import com.siyee.superagentweb.SuperAgentWebConfig;
+import com.siyee.superagentweb.WebViewClient;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.Callback;
 import com.siyee.superagentweb.utils.LogUtils;

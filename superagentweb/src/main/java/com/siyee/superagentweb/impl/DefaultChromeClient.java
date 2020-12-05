@@ -3,13 +3,13 @@ package com.siyee.superagentweb.impl;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Build;
+import android.text.TextUtils;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
 import android.webkit.WebView;
 
@@ -19,16 +19,19 @@ import androidx.annotation.RequiresApi;
 
 import com.siyee.superagentweb.SuperAgentWebConfig;
 import com.siyee.superagentweb.SuperAgentWebPermissions;
+import com.siyee.superagentweb.WebChromeClient;
 import com.siyee.superagentweb.abs.AbsAgentWebUIController;
 import com.siyee.superagentweb.abs.IVideo;
 import com.siyee.superagentweb.abs.IndicatorController;
 import com.siyee.superagentweb.abs.PermissionInterceptor;
+import com.siyee.superagentweb.bridge.InternalBridge;
 import com.siyee.superagentweb.utils.FileChooserUtils;
 import com.siyee.superagentweb.utils.LogUtils;
 import com.siyee.superagentweb.utils.PermissionUtils;
 import com.siyee.superagentweb.utils.SuperAgentWebUtils;
 
 import java.lang.ref.WeakReference;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -82,6 +85,8 @@ public class DefaultChromeClient extends WebChromeClient {
      */
     private WebView mWebView;
 
+    private InternalBridge mInternalBridge;
+
     /**
      * AbsAgentWebUIController
      */
@@ -91,11 +96,13 @@ public class DefaultChromeClient extends WebChromeClient {
                                IndicatorController indicatorController,
                                @Nullable IVideo iVideo,
                                PermissionInterceptor permissionInterceptor,
+                               @NonNull InternalBridge internalBridge,
                                WebView webView) {
         this.mIndicatorController = indicatorController;
         this.mPermissionInterceptor = permissionInterceptor;
         this.mVideo = iVideo;
         this.mWebView = webView;
+        this.mInternalBridge = internalBridge;
         this.mActivityWeakReference = new WeakReference<Activity>(activity);
         mAgentWebUIController = new WeakReference<AbsAgentWebUIController>(SuperAgentWebUtils.getAgentWebUIControllerByWebView(webView));
     }
@@ -149,6 +156,18 @@ public class DefaultChromeClient extends WebChromeClient {
 
     @Override
     public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+        if (this.mInternalBridge.getFactory() != null && !TextUtils.isEmpty(message) && message.startsWith(InternalBridge.URL_SCHEME)) {
+            // Bridge Invoke
+            try {
+                URI scheme = new URI(message);
+                String func = scheme.getHost();
+                String execResult = this.mInternalBridge.getFactory().exec(false, url, func, defaultValue);
+                result.confirm(execResult);
+            } catch (Exception e) {
+                this.mInternalBridge.consoleError("Bridge Error: URL SCHEME is invalid");
+            }
+            return true;
+        }
         try {
             if (this.mAgentWebUIController.get() != null) {
                 this.mAgentWebUIController.get().onJsPrompt(view, url, message, defaultValue, result);

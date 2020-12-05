@@ -16,6 +16,7 @@ import com.siyee.superagentweb.utils.SuperAgentWebUtils;
  */
 public class InternalBridge {
 
+    public static String URL_SCHEME = "jsbridge://";
     public static String INTERNAL_BRIDGE_NAME = "_invokeHandler";
 
     private IExecutorFactory mFactory;
@@ -24,6 +25,7 @@ public class InternalBridge {
 
     private static String CALL_BRIDGE_FUNC = "window._handleMessageFromNative('%s', '%s')";
     private static String INVOKE_CALLBACK_BRIDGE_FUNC = "window._handleInvokeCallbackFromNative(%d, '%s')";
+    private static String CONSOLE_ERROR = "console.log('%s')";
 
     public InternalBridge(@Nullable IExecutorFactory factory, @NonNull WebView webView, @NonNull JsAccessEntrace jsAccessEntrace) {
         this.mFactory = factory;
@@ -35,9 +37,17 @@ public class InternalBridge {
         return mFactory;
     }
 
+    public JsAccessEntrace getJsAccessEntrace() {
+        return mJsAccessEntrace;
+    }
+
     private void invokeCallbackToJs(int callbackId, @Nullable String result) {
         this.mJsAccessEntrace.callJs(String
                 .format(INVOKE_CALLBACK_BRIDGE_FUNC, callbackId, TextUtils.isEmpty(result) ? "{}" : result));
+    }
+
+    public void consoleError(String message) {
+        this.mJsAccessEntrace.callJs(String.format(CONSOLE_ERROR, message));
     }
 
     @Keep
@@ -49,7 +59,7 @@ public class InternalBridge {
         SuperAgentWebUtils.runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                String result = mFactory.exec(mWebView.getUrl(), func, paramString);
+                String result = mFactory.exec(true, mWebView.getUrl(), func, paramString);
                 invokeCallbackToJs(callbackId, result);
             }
         });
