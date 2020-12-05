@@ -31,7 +31,6 @@ public class IndicatorHandler implements IndicatorController {
 
 	@Override
 	public void progress(WebView v, int newProgress) {
-
 		if (newProgress == 0) {
 			reset();
 		} else if (newProgress > 0 && newProgress <= 10) {
@@ -73,7 +72,6 @@ public class IndicatorHandler implements IndicatorController {
 
 	@Override
 	public void showIndicator() {
-
 		if (mBaseIndicatorSpec != null) {
 			mBaseIndicatorSpec.show();
 		}
