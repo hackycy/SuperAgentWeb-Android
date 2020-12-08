@@ -159,7 +159,7 @@ public class DefaultChromeClient extends WebChromeClient {
                 && message.startsWith(InternalBridge.URL_SCHEME)) {
             // Bridge Invoke
             String func = message.replace(InternalBridge.URL_SCHEME, "");
-            String execResult = this.mInternalBridge.getFactory().exec(false, url, func, defaultValue);
+            String execResult = this.mInternalBridge.getFactory().exec(null, url, func, defaultValue);
             result.confirm(execResult);
             return true;
         }

@@ -59,10 +59,29 @@ public class InternalBridge {
         SuperAgentWebUtils.runOnUIThread(new Runnable() {
             @Override
             public void run() {
-                String result = mFactory.exec(true, mWebView.getUrl(), func, paramString);
-                invokeCallbackToJs(callbackId, result);
+                Promise p = new Promise(callbackId);
+                mFactory.exec(p, mWebView.getUrl(), func, paramString);
             }
         });
+    }
+
+    /**
+     * async invoke need this
+     */
+    public class Promise {
+
+        private int callbackId;
+
+        private Promise() { }
+
+        private Promise(int callbackId) {
+            this.callbackId = callbackId;
+        }
+
+        public void resolve(String result) {
+            invokeCallbackToJs(this.callbackId, result);
+        }
+
     }
 
 }
