@@ -6,10 +6,12 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.view.ViewGroup;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AlertDialog;
 
@@ -66,41 +68,61 @@ public class DefaultUIController extends AbsAgentWebUIController {
 		mAlertDialog.show();
 	}
 
+
+
 	@Override
-	public void onOpenPagePrompt(WebView view, String url, final Callback<Integer> callback) {
-		LogUtils.i(TAG, "onOpenPagePrompt");
-		Activity mActivity;
-		if ((mActivity = this.mActivity) == null || mActivity.isFinishing()) {
+	public void onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult jsPromptResult) {
+		Activity mActivity = this.mActivity;
+		if (mActivity == null || mActivity.isFinishing()) {
+			jsPromptResult.cancel();
 			return;
 		}
 		if (mActivity.isDestroyed()) {
+			jsPromptResult.cancel();
 			return;
 		}
-		if (mAskOpenOtherAppDialog == null) {
-			mAskOpenOtherAppDialog = new AlertDialog
-					.Builder(mActivity)
-					.setMessage(mResources.getString(R.string.superagentweb_leave_app_and_go_other_page,
-							SuperAgentWebUtils.getApplicationName(mActivity)))
-					.setTitle(mResources.getString(R.string.superagentweb_tips))
-					.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if (callback != null) {
-								callback.handleValue(-1);
-							}
+		// EditText View Layout
+		int padding = SuperAgentWebUtils.dp2px(mActivity, 18);
+		final EditText et = new EditText(mActivity);
+		et.setSingleLine();
+		et.setText(defaultValue);
+		FrameLayout container = new FrameLayout(mActivity);
+		container.addView(et);
+		FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+		lp.setMargins(padding, 0, padding, 0);
+		et.setLayoutParams(lp);
+		// dialog
+		mPromptDialog = new AlertDialog.Builder(mActivity)
+				.setView(container)
+				.setTitle(message)
+				.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						toDismissDialog(mPromptDialog);
+						toCancelJsresult(mJsPromptResult);
+					}
+				})
+				.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						toDismissDialog(mPromptDialog);
+
+						if (mJsPromptResult != null) {
+							mJsPromptResult.confirm(et.getText().toString());
 						}
-					})
-					.setPositiveButton(mResources.getString(R.string.superagentweb_leave), new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							if (callback != null) {
-								callback.handleValue(1);
-							}
-						}
-					})
-					.create();
-		}
-		mAskOpenOtherAppDialog.show();
+
+					}
+				})
+				.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						dialog.dismiss();
+						toCancelJsresult(mJsPromptResult);
+					}
+				})
+				.create();
+		this.mJsPromptResult = jsPromptResult;
+		mPromptDialog.show();
 	}
 
 	@Override
@@ -149,6 +171,43 @@ public class DefaultUIController extends AbsAgentWebUIController {
 		mConfirmDialog.setMessage(message);
 		this.mJsResult = jsResult;
 		mConfirmDialog.show();
+	}
+
+	@Override
+	public void onOpenPagePrompt(WebView view, String url, final Callback<Integer> callback) {
+		LogUtils.i(TAG, "onOpenPagePrompt");
+		Activity mActivity;
+		if ((mActivity = this.mActivity) == null || mActivity.isFinishing()) {
+			return;
+		}
+		if (mActivity.isDestroyed()) {
+			return;
+		}
+		if (mAskOpenOtherAppDialog == null) {
+			mAskOpenOtherAppDialog = new AlertDialog
+					.Builder(mActivity)
+					.setMessage(mResources.getString(R.string.superagentweb_leave_app_and_go_other_page,
+							SuperAgentWebUtils.getApplicationName(mActivity)))
+					.setTitle(mResources.getString(R.string.superagentweb_tips))
+					.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (callback != null) {
+								callback.handleValue(-1);
+							}
+						}
+					})
+					.setPositiveButton(mResources.getString(R.string.superagentweb_leave), new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							if (callback != null) {
+								callback.handleValue(1);
+							}
+						}
+					})
+					.create();
+		}
+		mAskOpenOtherAppDialog.show();
 	}
 
 	@Override
@@ -204,7 +263,7 @@ public class DefaultUIController extends AbsAgentWebUIController {
 							callback.handleValue(1);
 						}
 					}
-				})//
+				})
 				.setPositiveButton(mResources.getString(R.string.superagentweb_cancel), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -214,54 +273,6 @@ public class DefaultUIController extends AbsAgentWebUIController {
 					}
 				}).create();
 		mAlertDialog.show();
-	}
-
-	@Override
-	public void onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult jsPromptResult) {
-		Activity mActivity = this.mActivity;
-		if (mActivity == null || mActivity.isFinishing()) {
-			jsPromptResult.cancel();
-			return;
-		}
-		if (mActivity.isDestroyed()) {
-			jsPromptResult.cancel();
-			return;
-		}
-		if (mPromptDialog == null) {
-			final EditText et = new EditText(mActivity);
-			et.setText(defaultValue);
-			mPromptDialog = new AlertDialog.Builder(mActivity)
-					.setView(et)
-					.setTitle(message)
-					.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							toDismissDialog(mPromptDialog);
-							toCancelJsresult(mJsPromptResult);
-						}
-					})//
-					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							toDismissDialog(mPromptDialog);
-
-							if (mJsPromptResult != null) {
-								mJsPromptResult.confirm(et.getText().toString());
-							}
-
-						}
-					})
-					.setOnCancelListener(new DialogInterface.OnCancelListener() {
-						@Override
-						public void onCancel(DialogInterface dialog) {
-							dialog.dismiss();
-							toCancelJsresult(mJsPromptResult);
-						}
-					})
-					.create();
-		}
-		this.mJsPromptResult = jsPromptResult;
-		mPromptDialog.show();
 	}
 
 	@Override
